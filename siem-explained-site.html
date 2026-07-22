@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SIEM, Explained</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --em:#10B981;--blue:#58A6FF;--amber:#D29922;--red:#EF4444;--purple:#BC8CFF;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(16,185,129,0.13), transparent 45%),radial-gradient(circle at 90% 10%, rgba(88,166,255,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(16,185,129,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--em);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,44px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--em);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#0D1117;background:var(--em);border-color:var(--em);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--em);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:#6EE7B7;}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;white-space:pre-line;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .table-scroll{width:100%;overflow-x:auto;}
+  .cmd-table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+  .cmd-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--line);}
+  .cmd-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top;}
+  .cmd-table code{font-family:'JetBrains Mono',monospace;background:rgba(16,185,129,0.16);color:#6EE7B7;padding:2px 7px;border-radius:5px;font-size:12.5px;white-space:nowrap;}
+  .cmd-table tr:last-child td{border-bottom:none;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  .steps{display:flex;flex-direction:column;gap:10px;}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start;}
+  .step-num{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#0D1117;
+    background:var(--em);width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+  }
+  .step-body h4{margin:0 0 4px;font-size:14px;color:#6EE7B7;font-family:'Space Grotesk',sans-serif;}
+  .step-body p{margin:0;font-size:13px;color:#D6E2EE;line-height:1.55;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:24px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}.cmd-table th,.cmd-table td{padding:8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// SIEM interview notes</div>
+    <h1>SIEM, <span>Explained</span></h1>
+    <p>Why SIEM exists, how logs get processed, collection methods, sizing, backups, and a full troubleshooting playbook for when logs stop arriving.</p>
+  </div>
+  <div class="badge-row"><span class="badge">30+ topics</span><span class="badge">7 sections</span><span class="badge">real troubleshooting steps</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="what">What is SIEM?</button>
+    <button class="tab" data-tab="pipeline">Log Processing</button>
+    <button class="tab" data-tab="collection">Collection Methods</button>
+    <button class="tab" data-tab="syslog">Syslog</button>
+    <button class="tab" data-tab="sizing">Sizing & Backups</button>
+    <button class="tab" data-tab="troubleshoot">Troubleshooting</button>
+    <button class="tab" data-tab="watchlists">Watchlists</button>
+  </div>
+
+  <div class="section active" id="what">
+    <h2 class="section-title">What is SIEM?</h2>
+    <p class="section-sub">Why security tools working in isolation isn't enough.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="20" width="110" height="40" rx="6" fill="#141B24" stroke="#26303C"/><text x="75" y="45" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10">Firewall</text>
+        <rect x="20" y="70" width="110" height="40" rx="6" fill="#141B24" stroke="#26303C"/><text x="75" y="95" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10">Antivirus</text>
+        <rect x="20" y="120" width="110" height="40" rx="6" fill="#141B24" stroke="#26303C"/><text x="75" y="145" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10">IPS</text>
+
+        <path d="M130,40 L250,80" stroke="#10B981" stroke-width="1.5" marker-end="url(#si1)"/>
+        <path d="M130,90 L250,90" stroke="#10B981" stroke-width="1.5" marker-end="url(#si1)"/>
+        <path d="M130,140 L250,100" stroke="#10B981" stroke-width="1.5" marker-end="url(#si1)"/>
+
+        <rect x="260" y="55" width="160" height="70" rx="10" fill="#0F3A5C" stroke="#10B981" stroke-width="1.5"/>
+        <text x="340" y="85" text-anchor="middle" fill="#10B981" font-family="JetBrains Mono" font-weight="600" font-size="13">SIEM</text>
+        <text x="340" y="105" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10">correlates everything</text>
+
+        <path d="M420,90 L470,90" stroke="#EF4444" stroke-width="2" marker-end="url(#si2)"/>
+        <rect x="480" y="60" width="180" height="60" rx="8" fill="#3B0D0D" stroke="#EF4444"/>
+        <text x="570" y="85" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-weight="600" font-size="11">Alert fired 🚨</text>
+        <text x="570" y="103" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="9.5">pattern across tools</text>
+
+        <defs>
+          <marker id="si1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#10B981"/></marker>
+          <marker id="si2" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#EF4444"/></marker>
+        </defs>
+      </svg>
+      <div class="diagram-caption">SIEM centralizes logs from isolated tools and correlates them to catch what no single tool would see alone</div>
+    </div>
+    <div class="grid" id="what-grid"></div>
+  </div>
+
+  <div class="section" id="pipeline">
+    <h2 class="section-title">Log Processing Pipeline</h2>
+    <p class="section-sub">Parsing → Normalization → Aggregation → Correlation.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="40" width="150" height="50" rx="8" fill="#141B24" stroke="#58A6FF"/>
+        <text x="85" y="70" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-weight="600" font-size="12">Parsing</text>
+        <path d="M160,65 L195,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#pl1)"/>
+        <rect x="200" y="40" width="150" height="50" rx="8" fill="#141B24" stroke="#D29922"/>
+        <text x="275" y="70" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-weight="600" font-size="12">Normalization</text>
+        <path d="M350,65 L385,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#pl1)"/>
+        <rect x="390" y="40" width="150" height="50" rx="8" fill="#141B24" stroke="#BC8CFF"/>
+        <text x="465" y="70" text-anchor="middle" fill="#BC8CFF" font-family="JetBrains Mono" font-weight="600" font-size="12">Aggregation</text>
+        <path d="M540,65 L575,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#pl1)"/>
+        <rect x="580" y="40" width="115" height="50" rx="8" fill="#0F3A5C" stroke="#10B981"/>
+        <text x="637" y="70" text-anchor="middle" fill="#10B981" font-family="JetBrains Mono" font-weight="600" font-size="12">Correlation</text>
+        <defs><marker id="pl1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#8B98A5"/></marker></defs>
+      </svg>
+      <div class="diagram-caption">Raw log → structured fields → common format → grouped events → linked into a detection</div>
+    </div>
+    <div class="grid" id="pipeline-grid"></div>
+  </div>
+
+  <div class="section" id="collection">
+    <h2 class="section-title">Collection Methods</h2>
+    <p class="section-sub">How logs actually get onboarded from servers, network devices, cloud, and databases.</p>
+    <div class="grid" id="collection-grid"></div>
+  </div>
+
+  <div class="section" id="syslog">
+    <h2 class="section-title">Syslog</h2>
+    <p class="section-sub">The standard protocol for shipping logs from network devices.</p>
+    <div class="grid" id="syslog-grid"></div>
+  </div>
+
+  <div class="section" id="sizing">
+    <h2 class="section-title">Sizing & Backups</h2>
+    <p class="section-sub">Planning for capacity, and protecting the SIEM's own data.</p>
+    <div class="grid" id="sizing-grid"></div>
+  </div>
+
+  <div class="section" id="troubleshoot">
+    <h2 class="section-title">Troubleshooting: Logs Not Coming In</h2>
+    <p class="section-sub">"I troubleshoot this in layers — source, network, then SIEM." The full playbook, step by step.</p>
+    <div class="steps" id="steps-list"></div>
+  </div>
+
+  <div class="section" id="watchlists">
+    <h2 class="section-title">Watchlists / Reference Sets</h2>
+    <p class="section-sub">Predefined lists used for filtering and threat detection.</p>
+    <div class="grid" id="watchlists-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  what: [
+    ["What is SIEM?","SIEM (Security Information and Event Management) is a security solution that collects, analyzes, and correlates logs from multiple systems to detect and respond to security threats in real time."],
+    ["Why do we need SIEM?","Security tools like firewall, antivirus, and IPS work individually (in isolation). SIEM centralizes logs from all these sources, correlates events to detect advanced attacks, helps in real-time monitoring and alerting, supports incident investigation and forensics, and is required for compliance (like ISO, PCI-DSS)."],
+    ["Popular SIEM Solutions","Splunk\nIBM QRadar\nArcSight (Micro Focus)\nLogRhythm\nMicrosoft Sentinel\nElastic SIEM (ELK Stack)\nAlienVault OSSIM / USM\nGraylog"]
+  ],
+  pipeline: [
+    ["Parsing","The process of converting raw, unstructured logs into structured data by extracting meaningful fields like IP address, username, timestamp, and event type."],
+    ["Normalization","The process of converting logs from different sources into a common format or schema to provide a unified view."],
+    ["Aggregation","The process of combining multiple similar events into a single record over a period of time."],
+    ["Correlation","The process of linking multiple events based on predefined rules to detect suspicious or malicious activity."]
+  ],
+  collection: [
+    ["Log Collection Methods in SIEM","SIEM collects logs using multiple methods depending on the source.\n\nCommon methods:\n• Agent-based (Splunk Forwarder, etc.)\n• Syslog (network devices)\n• WMI (Windows logs)\n• API (Cloud logs like AWS CloudTrail)\n• Flat file monitoring\n• Database connectors (JDBC/ODBC)\n\nOne-line summary: different collection methods are used to onboard logs from servers, network devices, cloud, and databases."],
+    ["Push vs Pull Log Collection","Push Method — logs are sent by the source to SIEM. Example: Syslog, Agents. SIEM just listens.\n\nPull Method — SIEM actively fetches logs from the source at regular intervals. Example: API, WMI, DB queries.\n\nSmart line: push is passive collection, while pull is active collection."]
+  ],
+  syslog: [
+    ["What is Syslog?","Syslog is a standard protocol used to send log messages from network devices like routers, firewalls, and servers to a SIEM system.\n\nKey points:\n• Default port: 514\n• Secure Syslog (TLS): 6514\n• Works on UDP and TCP\n\nIt is widely used for collecting logs from network devices."]
+  ],
+  sizing: [
+    ["How do you size a SIEM?","SIEM sizing is done based on how much data it will handle, mainly using Events Per Second (EPS) and daily data volume.\n\nHow I approach it:\n• Identify number of log sources\n• Estimate how many logs each source generates (EPS)\n• Calculate total daily data\n\nExample: if 100 devices generate 10 events per second each, total EPS will be 1000.\n\nBonus line: we usually keep 20–30% extra capacity for future growth."],
+    ["How often should SIEM backups be taken?","Backups should be taken regularly, usually once every 7 days. We should also take manual backups before any major updates or configuration changes."]
+  ],
+  watchlists: [
+    ["What are Watchlists / Reference Sets?","Predefined lists of data like IP addresses, domains, or users used in SIEM for filtering and detecting threats.\n\nExamples:\n• Malicious IP list\n• Admin users list\n• Company public IPs\n\nThey are mainly used in correlation rules and to integrate threat intelligence."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">${a}</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+const steps = [
+  ["Scope the problem","First I check whether it's one source or all sources. All sources down points to a SIEM-side issue. Single source means I focus on that endpoint."],
+  ["Check the log source","I verify the forwarding agent is running, confirm the destination IP and port are correctly configured, and review agent logs for any connection errors."],
+  ["Check network connection","I first verify the correct port and protocol on both the log source and SIEM. Then I update the configuration, allow the port in the firewall, and restart services if needed. Finally, I retest connectivity using telnet or netcat and confirm that logs are reaching the SIEM."],
+  ["Check the SIEM receiver","I confirm the receiving port is enabled and listening. Then I check disk usage and license status — a full disk or license cap stops ingestion entirely."],
+  ["Check index and parsing","If logs are arriving but not visible, I look for parsing errors or misconfigured index — data may be present but not visible in search."],
+  ["Escalate if unresolved","If the issue is still not resolved, I escalate it to vendor support."]
+];
+const stepsList = document.getElementById('steps-list');
+steps.forEach(([title, desc], i) => {
+  const el = document.createElement('div');
+  el.className = 'step';
+  el.innerHTML = `<div class="step-num">${i+1}</div><div class="step-body"><h4>${title}</h4><p>${desc}</p></div>`;
+  stepsList.appendChild(el);
+});
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

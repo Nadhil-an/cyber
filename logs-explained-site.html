@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Logs, Explained</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --idg:#818CF8;--blue:#58A6FF;--green:#3FB950;--amber:#D29922;--red:#EF4444;--purple:#BC8CFF;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(129,140,248,0.14), transparent 45%),radial-gradient(circle at 90% 10%, rgba(88,166,255,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(129,140,248,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--idg);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,44px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--idg);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#0D1117;background:var(--idg);border-color:var(--idg);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--idg);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:#A5B4FC;}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;white-space:pre-line;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .table-scroll{width:100%;overflow-x:auto;}
+  .cmd-table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+  .cmd-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--line);}
+  .cmd-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top;}
+  .cmd-table code{font-family:'JetBrains Mono',monospace;background:rgba(129,140,248,0.16);color:#A5B4FC;padding:2px 7px;border-radius:5px;font-size:12.5px;white-space:nowrap;}
+  .cmd-table tr:last-child td{border-bottom:none;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:24px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}.cmd-table th,.cmd-table td{padding:8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// logging & log analysis notes</div>
+    <h1>Logs, <span>Explained</span></h1>
+    <p>Severity levels, Windows Event IDs, logon types, and the different log sources — firewall, IPS, proxy, WAF, cloud — organized for quick review.</p>
+  </div>
+  <div class="badge-row"><span class="badge">40+ topics</span><span class="badge">7 sections</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="levels">Logging Levels</button>
+    <button class="tab" data-tab="windows">Windows Event Logs</button>
+    <button class="tab" data-tab="logon">Logon Types</button>
+    <button class="tab" data-tab="security">AV & Firewall Logs</button>
+    <button class="tab" data-tab="perimeter">IPS, Proxy & WAF Logs</button>
+    <button class="tab" data-tab="cloud">Cloud & Database Logs</button>
+    <button class="tab" data-tab="concepts">Event vs Alert vs Incident</button>
+  </div>
+
+  <div class="section active" id="levels">
+    <h2 class="section-title">Logging Levels</h2>
+    <p class="section-sub">Classifying log messages by severity, so the critical ones stand out.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+        <g font-family="JetBrains Mono" font-size="11">
+        <rect x="20" y="10" width="660" height="26" rx="4" fill="#3B0D0D" stroke="#EF4444"/><text x="35" y="28" fill="#EF4444">0 — Emergency: system is unusable (e.g. complete network failure)</text>
+        <rect x="20" y="42" width="660" height="26" rx="4" fill="#3B1B0D" stroke="#F05033"/><text x="35" y="60" fill="#F05033">1 — Alert: needs immediate action (e.g. core router down)</text>
+        <rect x="20" y="74" width="660" height="26" rx="4" fill="#3B270D" stroke="#FB923C"/><text x="35" y="92" fill="#FB923C">2 — Critical: serious issue (e.g. disk almost full)</text>
+        <rect x="20" y="106" width="660" height="26" rx="4" fill="#3B330D" stroke="#D29922"/><text x="35" y="124" fill="#D29922">3 — Error: an error occurred (e.g. interface failed to connect)</text>
+        <rect x="20" y="138" width="660" height="26" rx="4" fill="#1B2430" stroke="#D29922"/><text x="35" y="156" fill="#D29922">4 — Warning: potential problem (e.g. high CPU or memory)</text>
+        <rect x="20" y="170" width="660" height="26" rx="4" fill="#1B2430" stroke="#58A6FF"/><text x="35" y="188" fill="#58A6FF">5 — Notification: normal but important event (e.g. login/logout)</text>
+        <rect x="20" y="202" width="660" height="26" rx="4" fill="#141B24" stroke="#3FB950"/><text x="35" y="220" fill="#3FB950">6 — Informational: general system info (e.g. service started)</text>
+        <rect x="20" y="234" width="660" height="26" rx="4" fill="#141B24" stroke="#8B98A5"/><text x="35" y="252" fill="#8B98A5">7 — Debugging: detailed logs for troubleshooting</text>
+        </g>
+      </svg>
+      <div class="diagram-caption">Highest severity (0) at the top, lowest (7) at the bottom</div>
+    </div>
+  </div>
+
+  <div class="section" id="windows">
+    <h2 class="section-title">Windows Event Logs</h2>
+    <p class="section-sub">What they record, where they live, and the Event IDs worth memorizing.</p>
+    <div class="grid" id="windows-grid"></div>
+    <div class="diagram-panel" style="margin-top:14px;">
+      <div class="table-scroll">
+      <table class="cmd-table">
+        <tr><th>Event ID</th><th>Meaning</th></tr>
+        <tr><td><code>4624</code></td><td>Successful login</td></tr>
+        <tr><td><code>4625</code></td><td>Failed login</td></tr>
+        <tr><td><code>4720</code></td><td>User created</td></tr>
+        <tr><td><code>4726</code></td><td>User deleted</td></tr>
+        <tr><td><code>4740</code></td><td>Account locked</td></tr>
+        <tr><td><code>4767</code></td><td>Account unlocked</td></tr>
+        <tr><td><code>1102</code></td><td>Logs cleared (⚠️ suspicious)</td></tr>
+      </table>
+      </div>
+      <div class="diagram-caption">The Event IDs every SOC interview asks about</div>
+    </div>
+  </div>
+
+  <div class="section" id="logon">
+    <h2 class="section-title">Windows Logon Types</h2>
+    <p class="section-sub">How the user logged in — attached to Event ID 4624/4625.</p>
+    <div class="diagram-panel">
+      <div class="table-scroll">
+      <table class="cmd-table">
+        <tr><th>Type</th><th>Meaning</th></tr>
+        <tr><td><code>2</code></td><td>Interactive — login from keyboard (local login)</td></tr>
+        <tr><td><code>3</code></td><td>Network — access via network (file share)</td></tr>
+        <tr><td><code>4</code></td><td>Batch — scheduled task</td></tr>
+        <tr><td><code>5</code></td><td>Service — service login</td></tr>
+        <tr><td><code>7</code></td><td>Unlock — unlock system</td></tr>
+        <tr><td><code>8</code></td><td>NetworkCleartext — password sent in clear text</td></tr>
+        <tr><td><code>9</code></td><td>NewCredentials — run as different user</td></tr>
+        <tr><td><code>10</code></td><td>RemoteInteractive — RDP login 🔥</td></tr>
+        <tr><td><code>11</code></td><td>CachedInteractive — offline login</td></tr>
+      </table>
+      </div>
+      <div class="diagram-caption">Most important to remember: 2, 3, and 10</div>
+    </div>
+  </div>
+
+  <div class="section" id="security">
+    <h2 class="section-title">Antivirus & Firewall Logs</h2>
+    <p class="section-sub">The fields analysts actually look at in each log type.</p>
+    <div class="grid" id="security-grid"></div>
+  </div>
+
+  <div class="section" id="perimeter">
+    <h2 class="section-title">IPS, Proxy & WAF Logs</h2>
+    <p class="section-sub">Perimeter security logs — what each one is used to detect.</p>
+    <div class="grid" id="perimeter-grid"></div>
+  </div>
+
+  <div class="section" id="cloud">
+    <h2 class="section-title">Cloud & Database Logs</h2>
+    <p class="section-sub">AWS-specific logging, and database auditing.</p>
+    <div class="grid" id="cloud-grid"></div>
+  </div>
+
+  <div class="section" id="concepts">
+    <h2 class="section-title">Event vs Alert vs Incident</h2>
+    <p class="section-sub">The escalation path from raw activity to a confirmed threat.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="40" width="180" height="50" rx="8" fill="#141B24" stroke="#58A6FF"/>
+        <text x="120" y="70" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-weight="600" font-size="12">Event</text>
+        <path d="M210,65 L260,65" stroke="#8B98A5" stroke-width="2" marker-end="url(#lg1)"/>
+        <rect x="270" y="40" width="180" height="50" rx="8" fill="#141B24" stroke="#D29922"/>
+        <text x="360" y="70" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-weight="600" font-size="12">Alert</text>
+        <path d="M450,65 L500,65" stroke="#8B98A5" stroke-width="2" marker-end="url(#lg1)"/>
+        <rect x="510" y="40" width="160" height="50" rx="8" fill="#0F3A5C" stroke="#EF4444"/>
+        <text x="590" y="70" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-weight="600" font-size="12">Incident</text>
+        <text x="120" y="115" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="9.5">raw activity</text>
+        <text x="360" y="115" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="9.5">matched a rule</text>
+        <text x="590" y="115" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="9.5">confirmed threat</text>
+        <defs><marker id="lg1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#8B98A5"/></marker></defs>
+      </svg>
+      <div class="diagram-caption">Not every event becomes an alert, and not every alert becomes an incident</div>
+    </div>
+    <div class="grid" id="concepts-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  windows: [
+    ["What are Windows Event Logs?","Logs that record everything happening in a Windows system."],
+    ["3 Main Types of Logs","Application — app-related events.\nSystem — OS & hardware events.\nSecurity — login, access, security events."],
+    ["Default Log Locations","Windows Logs → C:\\Windows\\System32\\config\\\nDHCP Logs → C:\\Windows\\System32\\DHCP\nLinux Logs → /var/log/messages"]
+  ],
+  security: [
+    ["Important Fields in Antivirus Logs","Date & Time\nHost (device name)\nIP Address\nFile Name & Path\nMalware Name\nMalware Type (Trojan, Worm, etc.)\nAction Taken (Deleted, Quarantined, etc.)"],
+    ["Firewall Logs","Used to see traffic allowed/blocked.\n\nImportant fields: Source IP, Destination IP, Destination Port, Source port, Protocol, Action, Timestamp.\n\nUse: detect suspicious connections (e.g. unknown IP access)."]
+  ],
+  perimeter: [
+    ["IPS Logs (Intrusion Prevention System)","Detects attacks in real-time.\n\nImportant fields: Source & Destination IP, Ports, Attack Name, Attack Severity, Action (Blocked/Allowed).\n\nUse: identify attacks like SQLi, XSS, brute-force."],
+    ["Proxy Logs","Tracks user internet activity.\n\nImportant fields: User, Source IP, URL/Domain, Website Category, Action (Allowed/Blocked), Bytes Sent/Received.\n\nUse: detect malicious browsing / data exfiltration."],
+    ["WAF Logs (Web Application Firewall)","Protects web apps from attacks.\n\nImportant fields: Client IP, URL, Request & Response Headers, HTTP Method (GET/POST), Status Code (200, 403, etc.), Attack Type (SQLi, XSS), Severity.\n\nUse: detect web attacks."]
+  ],
+  cloud: [
+    ["AWS Logs","CloudTrail → tracks API/user activity.\nCloudWatch → application/system logs."],
+    ["Database Logs","Audit Logs → who accessed/changed data."],
+    ["Why are raw logs important?","Used for: Forensics, Compliance, Incident investigation."]
+  ],
+  concepts: [
+    ["Flows vs Events","Event — a single activity (login, file access).\nFlow — a network traffic summary (packets, bytes, duration)."],
+    ["Event vs Alert vs Incident","Event — any activity happening in the system, like login or file access. Just raw data, not always harmful.\n\nAlert — generated when certain events match predefined rules in tools like Splunk or Microsoft Sentinel. Indicates something suspicious, but it's not confirmed yet and could be a false positive.\n\nIncident — when an alert is investigated and confirmed as a real security threat. At this stage, it's escalated and handled through the incident response process."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">${a}</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
