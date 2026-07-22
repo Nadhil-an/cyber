@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cyber Attacks</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --amb:#FB923C;--blue:#58A6FF;--green:#3FB950;--red:#EF4444;--purple:#BC8CFF;--amber:#D29922;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(251,146,60,0.13), transparent 45%),radial-gradient(circle at 90% 10%, rgba(239,68,68,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(251,146,60,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--amb);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,44px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--amb);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#0D1117;background:var(--amb);border-color:var(--amb);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amb);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:#FFB27A;}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;white-space:pre-line;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .table-scroll{width:100%;overflow-x:auto;}
+  .cmd-table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+  .cmd-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--line);}
+  .cmd-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top;}
+  .cmd-table code{font-family:'JetBrains Mono',monospace;background:rgba(251,146,60,0.14);color:#FFB27A;padding:2px 7px;border-radius:5px;font-size:12.5px;white-space:nowrap;}
+  .cmd-table tr:last-child td{border-bottom:none;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:24px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}.cmd-table th,.cmd-table td{padding:8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// cyber attacks notes</div>
+    <h1>Cyber <span>Attacks</span></h1>
+    <p>Kill Chain, MITRE ATT&CK, password attacks, phishing, DoS/DDoS, malware, OWASP Top 10, and web vulnerabilities — organized for quick review.</p>
+  </div>
+  <div class="badge-row"><span class="badge">40+ topics</span><span class="badge">8 sections</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="killchain">Kill Chain & MITRE</button>
+    <button class="tab" data-tab="aaa">AAA & Password Attacks</button>
+    <button class="tab" data-tab="network">Network Attacks</button>
+    <button class="tab" data-tab="phishing">Phishing Family</button>
+    <button class="tab" data-tab="dos">DoS & DDoS</button>
+    <button class="tab" data-tab="malware">Malware</button>
+    <button class="tab" data-tab="owasp">OWASP Top 10</button>
+    <button class="tab" data-tab="webvuln">Web Vulnerabilities</button>
+  </div>
+
+  <div class="section active" id="killchain">
+    <h2 class="section-title">Cyber Kill Chain & MITRE ATT&CK</h2>
+    <p class="section-sub">How an attack unfolds stage by stage, and the framework used to categorize attacker behavior.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 150" xmlns="http://www.w3.org/2000/svg">
+        <text x="350" y="18" text-anchor="middle" fill="#E6EDF3" font-family="Space Grotesk" font-weight="600" font-size="13">Cyber Kill Chain — 7 stages</text>
+        <g font-family="JetBrains Mono" font-size="8.5">
+        <rect x="10" y="35" width="90" height="55" rx="6" fill="#141B24" stroke="#58A6FF"/><text x="55" y="58" text-anchor="middle" fill="#58A6FF">Recon-</text><text x="55" y="70" text-anchor="middle" fill="#58A6FF">naissance</text>
+        <rect x="105" y="35" width="90" height="55" rx="6" fill="#141B24" stroke="#D29922"/><text x="150" y="58" text-anchor="middle" fill="#D29922">Weapon-</text><text x="150" y="70" text-anchor="middle" fill="#D29922">ization</text>
+        <rect x="200" y="35" width="90" height="55" rx="6" fill="#141B24" stroke="#3FB950"/><text x="245" y="63" text-anchor="middle" fill="#3FB950">Delivery</text>
+        <rect x="295" y="35" width="90" height="55" rx="6" fill="#141B24" stroke="#BC8CFF"/><text x="340" y="63" text-anchor="middle" fill="#BC8CFF">Exploitation</text>
+        <rect x="390" y="35" width="90" height="55" rx="6" fill="#141B24" stroke="#FB923C"/><text x="435" y="63" text-anchor="middle" fill="#FB923C">Installation</text>
+        <rect x="485" y="35" width="105" height="55" rx="6" fill="#141B24" stroke="#EF4444"/><text x="537" y="58" text-anchor="middle" fill="#EF4444">Command</text><text x="537" y="70" text-anchor="middle" fill="#EF4444">& Control</text>
+        <rect x="595" y="35" width="95" height="55" rx="6" fill="#0F3A5C" stroke="#F05033"/><text x="642" y="58" text-anchor="middle" fill="#F05033">Actions on</text><text x="642" y="70" text-anchor="middle" fill="#F05033">Objectives</text>
+        </g>
+        <text x="350" y="115" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">Defenders try to detect and break the chain at the earliest possible stage</text>
+      </svg>
+      <div class="diagram-caption">Lockheed Martin's 7-stage model of how an attack is carried out end to end</div>
+    </div>
+    <div class="grid" id="killchain-grid"></div>
+  </div>
+
+  <div class="section" id="aaa">
+    <h2 class="section-title">AAA & Password Attacks</h2>
+    <p class="section-sub">Authentication, Authorization, Accounting — and the ways attackers go after passwords.</p>
+    <div class="grid" id="aaa-grid"></div>
+  </div>
+
+  <div class="section" id="network">
+    <h2 class="section-title">Network Attacks</h2>
+    <p class="section-sub">Sniffing, spoofing, ARP/DNS poisoning, and man-in-the-middle.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="45" width="130" height="50" rx="8" fill="#141B24" stroke="#58A6FF"/>
+        <text x="95" y="75" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-size="11">victim</text>
+        <path d="M160,70 L540,70" stroke="#26303C" stroke-width="2" stroke-dasharray="4,4"/>
+        <rect x="540" y="45" width="130" height="50" rx="8" fill="#141B24" stroke="#3FB950"/>
+        <text x="605" y="75" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-size="11">real server</text>
+        <rect x="290" y="10" width="120" height="45" rx="8" fill="#0F3A5C" stroke="#EF4444"/>
+        <text x="350" y="30" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-weight="600" font-size="10">attacker</text>
+        <text x="350" y="45" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-size="9">(MITM)</text>
+        <path d="M300,55 L200,68" stroke="#EF4444" stroke-width="1.5" marker-end="url(#na1)"/>
+        <path d="M400,55 L500,68" stroke="#EF4444" stroke-width="1.5" marker-end="url(#na1)"/>
+        <text x="350" y="120" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">Traffic that looks direct actually routes through the attacker in the middle</text>
+        <defs><marker id="na1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#EF4444"/></marker></defs>
+      </svg>
+      <div class="diagram-caption">Man-in-the-Middle — the attacker secretly sits between both parties</div>
+    </div>
+    <div class="grid" id="network-grid"></div>
+  </div>
+
+  <div class="section" id="phishing">
+    <h2 class="section-title">Phishing Family</h2>
+    <p class="section-sub">Phishing and its more targeted variants.</p>
+    <div class="grid" id="phishing-grid"></div>
+  </div>
+
+  <div class="section" id="dos">
+    <h2 class="section-title">DoS & DDoS</h2>
+    <p class="section-sub">Flooding a target until it can't serve legitimate users.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="20" width="90" height="30" rx="6" fill="#141B24" stroke="#EF4444"/><text x="75" y="40" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-size="9">bot 1</text>
+        <rect x="30" y="55" width="90" height="30" rx="6" fill="#141B24" stroke="#EF4444"/><text x="75" y="75" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-size="9">bot 2</text>
+        <rect x="30" y="90" width="90" height="30" rx="6" fill="#141B24" stroke="#EF4444"/><text x="75" y="110" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-size="9">bot 3...N</text>
+        <path d="M120,35 L340,65" stroke="#EF4444" stroke-width="1.5" marker-end="url(#dd1)"/>
+        <path d="M120,70 L340,70" stroke="#EF4444" stroke-width="1.5" marker-end="url(#dd1)"/>
+        <path d="M120,105 L340,75" stroke="#EF4444" stroke-width="1.5" marker-end="url(#dd1)"/>
+        <rect x="350" y="45" width="130" height="50" rx="8" fill="#0F3A5C" stroke="#F05033"/>
+        <text x="415" y="75" text-anchor="middle" fill="#F05033" font-family="JetBrains Mono" font-weight="600" font-size="11">server ✗</text>
+        <text x="415" y="120" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10">overwhelmed — unavailable to real users</text>
+        <defs><marker id="dd1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#EF4444"/></marker></defs>
+      </svg>
+      <div class="diagram-caption">DDoS — a botnet of many machines floods one target at once</div>
+    </div>
+    <div class="grid" id="dos-grid"></div>
+  </div>
+
+  <div class="section" id="malware">
+    <h2 class="section-title">Malware</h2>
+    <p class="section-sub">Types of malicious software, and the virus/worm/trojan distinction.</p>
+    <div class="grid" id="malware-grid"></div>
+  </div>
+
+  <div class="section" id="owasp">
+    <h2 class="section-title">OWASP Top 10</h2>
+    <p class="section-sub">The most common web application security risks.</p>
+    <div class="diagram-panel">
+      <div class="table-scroll">
+      <table class="cmd-table">
+        <tr><th>#</th><th>Risk</th></tr>
+        <tr><td><code>A01</code></td><td>Broken Access Control — users access data/actions they aren't allowed to</td></tr>
+        <tr><td><code>A02</code></td><td>Security Misconfiguration — system is improperly configured</td></tr>
+        <tr><td><code>A03</code></td><td>Software Supply Chain Failures — compromised or insecure third-party dependencies</td></tr>
+        <tr><td><code>A04</code></td><td>Cryptographic Failures — sensitive data not properly encrypted</td></tr>
+        <tr><td><code>A05</code></td><td>Injection — malicious input (like SQL) manipulates the system</td></tr>
+        <tr><td><code>A06</code></td><td>Insecure Design — security not properly planned, exploitable logic flaws</td></tr>
+        <tr><td><code>A07</code></td><td>Authentication Failures — weak login system allows account takeover</td></tr>
+        <tr><td><code>A08</code></td><td>Software and Data Integrity Failures — tampering due to lack of integrity checks</td></tr>
+        <tr><td><code>A09</code></td><td>Logging & Monitoring Failures — system fails to detect/log attacks</td></tr>
+        <tr><td><code>A10</code></td><td>Mishandling of Exceptional Conditions — improper error handling leads to security issues</td></tr>
+      </table>
+      </div>
+    </div>
+    <div class="grid" id="owasp-grid"></div>
+  </div>
+
+  <div class="section" id="webvuln">
+    <h2 class="section-title">Web Vulnerabilities</h2>
+    <p class="section-sub">SQLi, XSS, CSRF, broken authentication, broken access control, and SSRF.</p>
+    <div class="grid" id="webvuln-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  killchain: [
+    ["Cyber Kill Chain","A 7-stage model defined by Lockheed Martin that describes how a cyber attack is carried out — from reconnaissance to achieving the attacker's objective. Helps defenders detect and stop attacks at different stages.\n\n1. Reconnaissance — gathering information.\n2. Weaponization — preparing malware.\n3. Delivery — sent to the victim, usually via phishing.\n4. Exploitation — a vulnerability is used to gain access.\n5. Installation — malware is installed on the system.\n6. Command and Control — attacker gains remote control.\n7. Actions on Objectives — attacker achieves their goal, such as data theft or ransomware."],
+    ["MITRE ATT&CK","A cybersecurity framework that provides a structured knowledge base of real-world attacker behavior. Categorizes how attackers operate using tactics and techniques, helping organizations detect, analyze, and defend against cyber attacks. Includes 14 tactics (high-level goals) and 250+ techniques (specific attack methods)."],
+    ["What are tactics in MITRE ATT&CK?","Tactics are the high-level goals of an attacker, such as initial access, execution, or data exfiltration."],
+    ["What are techniques?","Techniques are the specific methods attackers use to achieve those tactics, like phishing or PowerShell execution."],
+    ["Difference between tactics and techniques?","Tactics represent the 'why' (goal), while techniques represent the 'how' (method)."],
+    ["Example of a tactic and technique","Tactic: Initial Access.\nTechnique: Phishing email used to gain access."],
+    ["How is MITRE ATT&CK used in SOC?","SOC analysts use MITRE ATT&CK to map alerts to attacker techniques, which helps in detecting threats, analyzing attacks, and improving defense strategies."],
+    ["What is the use of MITRE ATT&CK?","It helps organizations understand attacker behavior, improve threat detection, and strengthen security controls."],
+    ["If you detect PowerShell misuse, how will you map it?","It can be mapped to the Execution tactic and the technique 'Command and Scripting Interpreter' in MITRE ATT&CK."],
+    ["Why is MITRE ATT&CK important for defenders?","It provides real-world attack patterns, helping defenders proactively detect and stop attacks."],
+    ["MITRE ATT&CK vs Cyber Kill Chain?","Cyber Kill Chain focuses on attack stages, while MITRE ATT&CK provides detailed techniques used by attackers at each stage."],
+    ["What are TTPs?","Tactics, Techniques, and Procedures — the actual methods and strategies used by attackers during a cyber attack, and MITRE ATT&CK organizes these TTPs.\n\nTactics → what the attacker wants to achieve (goal)\nTechniques → how the attacker achieves it\nProcedures → the exact steps or tools used"]
+  ],
+  aaa: [
+    ["AAA","Stands for Authentication, Authorization, and Accounting — a security framework used to control and monitor access to systems and resources.\n\nAuthentication → verifies the identity of a user (e.g. username and password)\nAuthorization → determines what the user is allowed to access or do\nAccounting → tracks and logs user activities"],
+    ["Brute-force Attack","An attacker tries all possible combinations of passwords until the correct one is found.\n\nPrevention: strong passwords, account lockout after multiple attempts, CAPTCHA, multi-factor authentication (MFA)."],
+    ["Dictionary Attack","A type of brute-force attack where the attacker uses a list of common passwords or words (like from a dictionary) instead of trying all combinations.\n\nPrevention: avoid common/simple passwords, use complex passwords, account lockout & CAPTCHA, MFA."],
+    ["Rainbow Table Attack","Uses precomputed hash values to crack passwords instead of guessing them directly.\n\nPrevention: use salting (adds randomness to passwords before hashing), account lockout, CAPTCHA, MFA."]
+  ],
+  network: [
+    ["Sniffing Attack","An attacker captures and reads network traffic to steal sensitive data like passwords or login details.\n\nExample: capturing data on public Wi-Fi.\n\nPrevention: use HTTPS instead of HTTP, use encryption (VPN, SSL/TLS), avoid insecure networks."],
+    ["Spoofing","An attacker pretends to be a trusted source (like an IP, email, or website) to trick users or systems.\n\nTypes: IP Spoofing, MAC Spoofing, Email Spoofing, DNS Spoofing.\n\nPrevention: authentication methods (IP filtering), security protocols (ARP protection), user awareness (for email spoofing)."],
+    ["ARP Poisoning","An attacker sends fake ARP messages on a network to associate their MAC address with the IP address of a legitimate device. This allows the attacker to intercept, modify, or block network traffic."],
+    ["Man-in-the-Middle (MITM) Attack","Occurs when an attacker secretly intercepts communication between two parties. The attacker can intercept or even alter the data being exchanged without the knowledge of either party."],
+    ["DNS Poisoning","False DNS records are inserted into a DNS cache, redirecting users from legitimate websites to malicious ones — often used for phishing or malware distribution."]
+  ],
+  phishing: [
+    ["Phishing","Attackers send fake emails or messages to trick users into sharing sensitive information or clicking malicious links.\n\nExample: fake bank email asking for login details.\n\nPrevention: email security filters, verify links before clicking, DMARC/SPF/DKIM, user awareness."],
+    ["Spear Phishing","A targeted phishing attack aimed at a specific person or organization, using personal information to make the message look genuine."],
+    ["Whaling","A type of phishing that targets high-level executives (like CEOs, managers) to steal sensitive or financial information."],
+    ["Vishing (Voice Phishing)","A phishing attack done through phone calls, where attackers trick victims into sharing confidential information."]
+  ],
+  dos: [
+    ["DoS Attack","A single source attacker floods a server with traffic to make it unavailable for users."],
+    ["DDoS Attack","Uses multiple systems (botnet) to flood a targeted server with huge traffic, making it unavailable for legitimate users."],
+    ["SYN Flood Attack","A type of DoS attack where an attacker exploits the TCP three-way handshake by sending a large number of SYN requests but not completing the handshake. This causes the server to keep connections half-open, eventually exhausting resources and making the service unavailable to legitimate users."]
+  ],
+  malware: [
+    ["Malware","Any malicious software designed to harm systems, steal sensitive information, or gain unauthorized access. Examples include viruses, worms, ransomware, and trojans."],
+    ["Types of Malware","Spyware — steals user information without their knowledge; an installed keylogger can capture everything the user types, including login credentials and personal information.\nRansomware — locks files and demands payment.\nAdware — shows unwanted ads.\nBotnet — network of infected systems controlled by an attacker.\nRAT — provides remote access to the attacker."],
+    ["Virus vs Worm vs Trojan","Virus — attaches to a file and spreads when the file is executed. Requires user action (like opening a file).\n\nWorm — spreads automatically over networks without user action. No user interaction needed.\n\nTrojan — poses as legitimate software to trick users into installing it, after which it can create a backdoor, steal data, or let attackers take control of the system. Does not self-spread, relies on the user being fooled."],
+    ["Ransomware","A type of malware that locks or encrypts your files/system and demands money (ransom) to unlock them.\n\nHow it works:\n1. You click a malicious link/email\n2. Ransomware installs silently\n3. It encrypts your files\n4. Shows a message: 'Pay money to get your files back'\n\nPrevention: don't open unknown email attachments, keep your system updated, use antivirus software, take regular data backups."]
+  ],
+  owasp: [
+    ["What is OWASP?","A non-profit organization that provides guidelines, tools, and the OWASP Top 10 to improve web application security."]
+  ],
+  webvuln: [
+    ["SQL Injection (SQLi)","An attacker inserts malicious SQL queries into input fields to access or modify the database.\n\nPrevention: parameterized queries (prepared statements), input validation, use ORM frameworks."],
+    ["Cross-Site Scripting (XSS)","A client-side vulnerability where attackers inject malicious scripts into web pages viewed by other users. Occurs when user input is not properly validated or escaped.\n\nThree main types: reflected, stored, and DOM-based XSS. Can lead to session hijacking, data theft, and account compromise.\n\nPrevention: input validation & output encoding, use Content Security Policy (CSP)."],
+    ["Cross-Site Request Forgery (CSRF)","A vulnerability where the attacker tricks the user into performing an unintended action on the web application.\n\nWhen a user logs into a website, the browser stores a session cookie. If the user later visits a malicious site, it can send a forged request to the original application. Since the browser automatically includes the session cookie, the server processes the request as legitimate. This can lead to unauthorized actions like changing passwords or transferring money.\n\nPrevention: CSRF tokens and SameSite cookies."],
+    ["Broken Authentication","Happens when authentication mechanisms are poorly implemented, allowing attackers to compromise accounts. Occurs when login or session management is weak, allowing attackers to guess, steal, or bypass authentication.\n\nImpact: account takeover, session hijacking, unauthorized access."],
+    ["Broken Access Control","Users can access data or actions they are not authorized for.\n\nPrevention: proper role-based access control, server-side validation."],
+    ["SSRF (Server-Side Request Forgery)","A vulnerability where an attacker tricks the server into making requests to internal or external systems. Instead of the attacker sending requests directly, they make the server send requests on their behalf, often to internal services that aren't publicly accessible.\n\nImpact: access to internal APIs (e.g. localhost, cloud metadata), data leakage."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">${a}</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
