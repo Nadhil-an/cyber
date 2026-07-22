@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Incident Response, Explained</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --sky:#0EA5E9;--blue:#58A6FF;--green:#3FB950;--amber:#D29922;--red:#EF4444;--purple:#BC8CFF;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(14,165,233,0.13), transparent 45%),radial-gradient(circle at 90% 10%, rgba(88,166,255,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(14,165,233,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--sky);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,5vw,42px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--sky);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#fff;background:var(--sky);border-color:var(--sky);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--sky);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:#7DD3FC;}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;font-style:italic;white-space:pre-line;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  .steps{display:flex;flex-direction:column;gap:10px;}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start;}
+  .step-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;background:var(--sky);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+  .step-body h4{margin:0 0 4px;font-size:14px;color:#7DD3FC;font-family:'Space Grotesk',sans-serif;}
+  .step-body p{margin:0;font-size:13px;color:#D6E2EE;line-height:1.55;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:23px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// incident response interview notes</div>
+    <h1>Incident <span>Response</span></h1>
+    <p>How to talk through a malware alert or a phishing report the way a SOC analyst actually would — not a memorized checklist, but a real thought process.</p>
+  </div>
+  <div class="badge-row"><span class="badge">malware handling</span><span class="badge">phishing investigation</span><span class="badge">natural spoken answers</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="malware">Malware Alert</button>
+    <button class="tab" data-tab="removal">Manual Removal</button>
+    <button class="tab" data-tab="phishing">Phishing Alert</button>
+    <button class="tab" data-tab="email">Email Headers & SPF/DKIM/DMARC</button>
+  </div>
+
+  <div class="section active" id="malware">
+    <h2 class="section-title">Handling a Malware Alert</h2>
+    <p class="section-sub">The thought process from "alert fires" to "incident closed."</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="40" width="130" height="50" rx="8" fill="#141B24" stroke="#0EA5E9"/><text x="75" y="70" text-anchor="middle" fill="#0EA5E9" font-family="JetBrains Mono" font-size="11">Validate + gather IOCs</text>
+        <path d="M140,65 L180,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#ir1)"/>
+        <rect x="190" y="40" width="130" height="50" rx="8" fill="#141B24" stroke="#D29922"/><text x="255" y="70" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-size="11">Check AV/EDR action</text>
+        <path d="M320,65 L360,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#ir1)"/>
+        <rect x="370" y="40" width="130" height="50" rx="8" fill="#141B24" stroke="#F05033"/><text x="435" y="70" text-anchor="middle" fill="#F05033" font-family="JetBrains Mono" font-size="11">Isolate if not quarantined</text>
+        <path d="M500,65 L540,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#ir1)"/>
+        <rect x="550" y="40" width="140" height="50" rx="8" fill="#0F3A5C" stroke="#3FB950"/><text x="620" y="70" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-size="11">Remove, scan, document</text>
+        <defs><marker id="ir1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#8B98A5"/></marker></defs>
+      </svg>
+      <div class="diagram-caption">Isolation only happens if quarantine actually failed — not automatically</div>
+    </div>
+    <div class="grid" id="malware-grid"></div>
+  </div>
+
+  <div class="section" id="removal">
+    <h2 class="section-title">Manual Malware Removal</h2>
+    <p class="section-sub">What to do when the antivirus can't clean it up on its own.</p>
+    <div class="steps" id="removal-steps"></div>
+    <div class="grid" id="removal-grid" style="margin-top:14px;"></div>
+  </div>
+
+  <div class="section" id="phishing">
+    <h2 class="section-title">Handling a Phishing Alert</h2>
+    <p class="section-sub">Reading the email like an attacker built it, then containing the damage.</p>
+    <div class="grid" id="phishing-grid"></div>
+  </div>
+
+  <div class="section" id="email">
+    <h2 class="section-title">Email Headers & SPF / DKIM / DMARC</h2>
+    <p class="section-sub">The three checks that tell you whether a "from" address can be trusted.</p>
+    <div class="grid" id="email-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  malware: [
+    ["How do you handle a malware alert?","So the first thing I do is validate the alert itself — I don't want to act on a false positive. I pull together the basics: hostname, affected user, file path, hash, the process name, and whatever triggered the detection. Then I check whether the antivirus or EDR already quarantined the file successfully.\n\nIf it did, great — I still investigate to understand what happened and confirm there's no lingering risk. If it didn't quarantine, that's when I isolate the host from the network so the malware can't move laterally. From there I dig into the malware's behavior, check related logs, see what else it touched, remove it, run a full scan, and close it out with documentation — escalating if the scope looks bigger than a single machine."],
+    ["What details would you collect during a malware investigation?","Mainly whatever helps me scope the incident: hostname, username, file path, file hash, the process that was running, the malware name if known, when it was detected, any network connections it made, and what action the AV or EDR already took. Hash and network connections are usually the two that tell me the most — the hash lets me check reputation quickly, and the connections tell me if it was talking to anything external."],
+    ["What if the antivirus fails to quarantine the malware?","Then I don't wait — I isolate the host from the network right away so it can't spread. After that I look into what the malicious process is actually doing, remove it manually if the AV can't, and run a complete scan to make sure nothing else is lingering."],
+    ["Should the infected machine always be disconnected from the network?","In most cases, yes — isolating it is the safest move to stop lateral movement. The one place I'd be more careful is a critical production system, where pulling it offline could cause a bigger business impact than the malware itself. In that case I'd weigh the risk with whoever owns that system before isolating."]
+  ],
+  removal: [
+    ["What tool would you use for manual malware investigation?","Process Explorer from Sysinternals is the one I'd reach for — it's great for spotting suspicious processes and digging into what they're actually doing on the box."],
+    ["Why boot into Safe Mode during removal?","Safe Mode only loads the minimum services Windows needs, so most malware — especially anything relying on other processes or services to run — doesn't start up at all. That makes it a lot easier to actually delete the files without them fighting back."]
+  ],
+  phishing: [
+    ["How do you handle a phishing alert?","I start by reading the email the way an attacker built it — sender address, subject, the actual body, any links, attachments, and the headers. That tells me if it's genuinely malicious or just a weird but harmless email.\n\nIf something looks off, I check the reputation of the URLs, domains, IPs, and attachments using something like VirusTotal or URLVoid. Once I'm confident it's phishing, I contain it — blocking the sender, domain, or URLs at the email gateway or firewall. Then I find who else received it, pull it from their mailboxes if needed, and make sure the incident gets documented and the affected users get a heads-up."],
+    ["What indicators suggest an email is phishing?","A few things tend to stack up together — a sender address that looks slightly off, a misspelled or lookalike domain, urgent or threatening language pushing you to act fast, grammar that doesn't read naturally, unexpected attachments, a login page that doesn't quite match the real site, or a shortened URL hiding where it actually goes."],
+    ["Which tools do you use during phishing analysis?","VirusTotal and URLVoid for reputation checks, MXToolbox and a Whois lookup for domain info, a sandbox like Any.Run if I need to safely detonate an attachment, and whatever email security gateway the org already has in place."],
+    ["What actions do you take after confirming phishing?","Block the sender or domain, pull the email out of any mailbox it landed in, block the related IPs or URLs, reset credentials if there's any chance they were entered, let the affected users know what happened, and document the whole thing — escalating if it looks bigger than one user."],
+    ["What if a user actually clicked the link?","Then I move faster — isolate that endpoint if there's any sign of malware or credential compromise, reset their password, and go through the logs to see what happened after the click. I'd also keep an eye on that account for a while afterward, since a clicked link doesn't always mean immediate damage."],
+    ["Why does user awareness matter so much for phishing?","Because phishing isn't really attacking the technology — it's attacking the person. All the filtering in the world won't stop every email, so the last line of defense is whether the user recognizes something's wrong before they click. That's why training actually moves the needle here more than most other controls."]
+  ],
+  email: [
+    ["Why do we analyze email headers?","Because the 'From' name you see isn't always the real story — headers show the actual sending server, the path the email took, the source IP, and whether SPF, DKIM, and DMARC passed. That's usually where spoofing gets exposed."],
+    ["What is SPF?","SPF checks whether the server that sent the email is actually authorized to send mail for that domain. If a message claims to be from a company but comes from a random unrelated server, SPF is what flags that mismatch."],
+    ["What is DKIM?","DKIM is a signature attached to the email that proves the content wasn't tampered with in transit — basically confirming the message arrived exactly as it was sent."],
+    ["What is DMARC?","DMARC is the policy layer on top of SPF and DKIM — it tells receiving mail servers what to actually do when a message fails those checks: quarantine it, reject it outright, or just monitor for now."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">"${a}"</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+const removalSteps = [
+  ["Identify the malicious process","Find out exactly what's running and misbehaving — usually with Process Explorer."],
+  ["Locate the file path","Trace the process back to where the actual malicious file lives on disk."],
+  ["Boot into Safe Mode if needed","This stops the malware (and whatever it depends on) from loading in the first place."],
+  ["Delete the malicious file","Remove the file itself now that it can't relaunch or resist deletion."],
+  ["Remove persistence mechanisms","Check registry run keys and startup tasks — malware often re-adds itself unless these are cleaned too."],
+  ["Run a full antivirus scan","Confirm nothing else got dropped alongside the original file."],
+  ["Monitor for re-infection","Keep an eye on the system for a while after — a clean scan doesn't always mean it's fully gone for good."]
+];
+const stepsList = document.getElementById('removal-steps');
+removalSteps.forEach(([title, desc], i) => {
+  const el = document.createElement('div');
+  el.className = 'step';
+  el.innerHTML = `<div class="step-num">${i+1}</div><div class="step-body"><h4>${title}</h4><p>${desc}</p></div>`;
+  stepsList.appendChild(el);
+});
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Threat Hunting, Explained</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --fux:#D946EF;--blue:#58A6FF;--green:#3FB950;--amber:#D29922;--red:#EF4444;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(217,70,239,0.13), transparent 45%),radial-gradient(circle at 90% 10%, rgba(88,166,255,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(217,70,239,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--fux);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,5vw,42px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--fux);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#fff;background:var(--fux);border-color:var(--fux);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--fux);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:#F0ABFC;}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;font-style:italic;white-space:pre-line;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:23px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// threat hunting interview notes</div>
+    <h1>Threat <span>Hunting</span></h1>
+    <p>Going looking for threats instead of waiting for an alert — techniques, the OODA loop, the Diamond Model, and what actually makes a good hunter.</p>
+  </div>
+  <div class="badge-row"><span class="badge">proactive detection</span><span class="badge">OODA loop</span><span class="badge">natural spoken answers</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="basics">What is Threat Hunting?</button>
+    <button class="tab" data-tab="techniques">Techniques</button>
+    <button class="tab" data-tab="ooda">OODA Loop</button>
+    <button class="tab" data-tab="diamond">Diamond Model & MITRE</button>
+    <button class="tab" data-tab="hypotheses">Hunting Hypotheses</button>
+    <button class="tab" data-tab="skills">Skills & Measuring Success</button>
+  </div>
+
+  <div class="section active" id="basics">
+    <h2 class="section-title">What is Threat Hunting?</h2>
+    <p class="section-sub">The difference between reacting to alerts and going looking for trouble yourself.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="30" width="290" height="70" rx="10" fill="#141B24" stroke="#58A6FF"/>
+        <text x="175" y="55" text-anchor="middle" fill="#58A6FF" font-family="Space Grotesk" font-weight="600" font-size="13">Threat Detection</text>
+        <text x="175" y="75" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">reacts when a tool fires an alert</text>
+
+        <rect x="380" y="30" width="290" height="70" rx="10" fill="#141B24" stroke="#D946EF"/>
+        <text x="525" y="55" text-anchor="middle" fill="#D946EF" font-family="Space Grotesk" font-weight="600" font-size="13">Threat Hunting</text>
+        <text x="525" y="75" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">actively searches for what never triggered one</text>
+      </svg>
+      <div class="diagram-caption">Hunting exists specifically to catch what your tools would otherwise miss</div>
+    </div>
+    <div class="grid" id="basics-grid"></div>
+  </div>
+
+  <div class="section" id="techniques">
+    <h2 class="section-title">Threat Hunting Techniques</h2>
+    <p class="section-sub">Four ways to actually go digging through the data.</p>
+    <div class="grid" id="techniques-grid"></div>
+  </div>
+
+  <div class="section" id="ooda">
+    <h2 class="section-title">The OODA Loop</h2>
+    <p class="section-sub">Observe, Orient, Decide, Act — the mental loop hunters run continuously.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="40" width="150" height="50" rx="8" fill="#141B24" stroke="#58A6FF"/><text x="85" y="70" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-weight="600" font-size="12">Observe</text>
+        <path d="M160,65 L200,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#oo1)"/>
+        <rect x="210" y="40" width="150" height="50" rx="8" fill="#141B24" stroke="#D29922"/><text x="285" y="70" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-weight="600" font-size="12">Orient</text>
+        <path d="M360,65 L400,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#oo1)"/>
+        <rect x="410" y="40" width="150" height="50" rx="8" fill="#141B24" stroke="#3FB950"/><text x="485" y="70" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-weight="600" font-size="12">Decide</text>
+        <path d="M560,65 L600,65" stroke="#8B98A5" stroke-width="1.5" marker-end="url(#oo1)"/>
+        <rect x="610" y="40" width="80" height="50" rx="8" fill="#3B0D2E" stroke="#D946EF"/><text x="650" y="70" text-anchor="middle" fill="#D946EF" font-family="JetBrains Mono" font-weight="600" font-size="12">Act</text>
+        <defs><marker id="oo1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#8B98A5"/></marker></defs>
+      </svg>
+      <div class="diagram-caption">This loops continuously — it's not a one-time checklist</div>
+    </div>
+    <div class="grid" id="ooda-grid"></div>
+  </div>
+
+  <div class="section" id="diamond">
+    <h2 class="section-title">The Diamond Model & MITRE ATT&CK</h2>
+    <p class="section-sub">Two frameworks for understanding how an attack actually happened.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg">
+        <text x="250" y="30" text-anchor="middle" fill="#F0ABFC" font-family="JetBrains Mono" font-weight="600" font-size="12">Adversary</text>
+        <text x="250" y="230" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-weight="600" font-size="12">Infrastructure</text>
+        <text x="70" y="135" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-weight="600" font-size="12">Capability</text>
+        <text x="430" y="135" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-weight="600" font-size="12">Victim</text>
+        <path d="M250,45 L90,120 L250,215 L410,120 Z" fill="none" stroke="#26303C" stroke-width="1.5"/>
+        <path d="M250,45 L90,120" stroke="#D946EF" stroke-width="1"/>
+        <path d="M250,45 L410,120" stroke="#D946EF" stroke-width="1"/>
+        <path d="M250,215 L90,120" stroke="#D946EF" stroke-width="1"/>
+        <path d="M250,215 L410,120" stroke="#D946EF" stroke-width="1"/>
+      </svg>
+      <div class="diagram-caption">Four connected points that explain how an attack was carried out and who's involved</div>
+    </div>
+    <div class="grid" id="diamond-grid"></div>
+  </div>
+
+  <div class="section" id="hypotheses">
+    <h2 class="section-title">Hunting Hypotheses</h2>
+    <p class="section-sub">You don't hunt randomly — you start with a theory and go verify it.</p>
+    <div class="grid" id="hypotheses-grid"></div>
+  </div>
+
+  <div class="section" id="skills">
+    <h2 class="section-title">Skills & Measuring Success</h2>
+    <p class="section-sub">What makes someone actually good at this, and how you'd know it's working.</p>
+    <div class="grid" id="skills-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  basics: [
+    ["What is Threat Hunting?","It's the proactive side of security — instead of waiting for a tool to fire an alert, analysts actively go dig through logs and endpoint data looking for hidden threats that might have slipped past everything else."],
+    ["How is it different from threat detection?","Detection is reactive — it responds to whatever a tool already flagged. Hunting flips that around and goes looking for suspicious activity that never triggered an alert in the first place, which matters because plenty of real attacker behavior doesn't look 'malicious enough' to any automated rule."],
+    ["Why do we actually do threat hunting?","Because it catches the stuff traditional tools miss — advanced or novel threats, attackers who've been sitting quietly in the environment for a while. It reduces dwell time, improves overall visibility into what's really happening, and surfaces gaps in detection that you wouldn't find any other way."],
+    ["What tools are typically used?","Splunk and the ELK stack for digging through logs, EDR platforms for endpoint visibility, and tools built specifically for hunting like Exabeam, Endgame, or Vectra AI."]
+  ],
+  techniques: [
+    ["Searching","This is the most direct one — analysts search through logs and endpoint data using specific keywords or criteria they're expecting to find, based on a hypothesis."],
+    ["Clustering","Grouping data points to surface patterns or anomalies that wouldn't be obvious looking at events one at a time — useful when the dataset is too large to eyeball manually."],
+    ["Grouping","Taking related suspicious artifacts — files, connections, processes — and putting them together to see if they add up to a bigger malicious picture."],
+    ["Stack Counting","Counting how often something occurs across the environment, specifically to find the rare or unusual ones. If 999 machines run a process normally and one runs it differently, stack counting is what surfaces that outlier."]
+  ],
+  ooda: [
+    ["What is the OODA Loop?","It stands for Observe, Orient, Decide, Act — a decision-making loop originally from military strategy that threat hunters borrow to stay fast and structured. Observe means collecting the data. Orient is making sense of it — analyzing what you're actually looking at. Decide is figuring out what response makes sense. And Act is actually executing that response. Hunters run through this loop continuously, not as a one-time process — as new data comes in, you're constantly re-observing and re-orienting."]
+  ],
+  diamond: [
+    ["What is the Diamond Model?","It's a framework for breaking down an attack into four connected elements — the Adversary carrying it out, the Victim being targeted, the Infrastructure used (like servers or domains), and the Capability, meaning the actual tools or malware involved. Mapping an incident onto these four points helps you understand not just what happened, but who was involved and how the pieces connect."],
+    ["How is MITRE ATT&CK used in threat hunting?","Hunters use it to map out attacker techniques, spot gaps in what their current detection actually covers, and build hunting hypotheses around specific techniques — like 'let's go check if anyone's abusing scheduled tasks for persistence.' It also helps improve monitoring over time by showing exactly where visibility is thin."]
+  ],
+  hypotheses: [
+    ["Example: Malware Hunting","A hunter might dig into suspicious PowerShell activity, or look for unusual parent-child process relationships — like a Word document spawning PowerShell — since that pattern often points to malware execution even when nothing's been flagged yet."],
+    ["Example: C2 Communication Hunting","This is about looking for unusual outbound connections — traffic going somewhere unexpected, at odd intervals, or to a destination with no clear business reason — which can point to command-and-control communication."],
+    ["Example: Internal Reconnaissance","Looking for commands like whoami, ipconfig, or net user showing up in places or sequences that look suspicious — that's often a sign an attacker is already inside and mapping out the environment before their next move."]
+  ],
+  skills: [
+    ["What makes someone good at threat hunting?","A solid grasp of attack techniques, comfort reading logs and understanding normal network behavior, strong analytical thinking, a knack for pattern recognition, familiarity with MITRE ATT&CK, and enough scripting knowledge to automate the repetitive parts of a hunt."],
+    ["How do you measure whether threat hunting is actually working?","A few signals: how many real threats get found, whether dwell time is trending down, how many detection gaps get identified and fixed, whether false positives are dropping, and whether hunts are actually producing new detection rules the SOC can reuse going forward."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">"${a}"</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

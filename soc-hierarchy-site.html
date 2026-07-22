@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SOC Hierarchy, Explained</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --gold:#F59E0B;--blue:#58A6FF;--green:#3FB950;--red:#EF4444;--purple:#BC8CFF;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(245,158,11,0.13), transparent 45%),radial-gradient(circle at 90% 10%, rgba(88,166,255,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(245,158,11,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,5vw,42px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--gold);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#0D1117;background:var(--gold);border-color:var(--gold);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:#FCD34D;}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;font-style:italic;white-space:pre-line;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .table-scroll{width:100%;overflow-x:auto;}
+  .cmd-table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+  .cmd-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--line);}
+  .cmd-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top;}
+  .cmd-table code{font-family:'JetBrains Mono',monospace;background:rgba(245,158,11,0.16);color:#FCD34D;padding:2px 7px;border-radius:5px;font-size:12.5px;white-space:nowrap;}
+  .cmd-table tr:last-child td{border-bottom:none;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:23px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}.cmd-table th,.cmd-table td{padding:8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// SOC structure & operations notes</div>
+    <h1>SOC <span>Hierarchy</span></h1>
+    <p>How a Security Operations Center is structured, the five deployment models, SLAs, and how to walk through a real alert investigation.</p>
+  </div>
+  <div class="badge-row"><span class="badge">tiered structure</span><span class="badge">5 SOC models</span><span class="badge">SLA tiers</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="why">Why a SOC?</button>
+    <button class="tab" data-tab="tiers">Tiers & Roles</button>
+    <button class="tab" data-tab="models">SOC Models</button>
+    <button class="tab" data-tab="sla">SLA</button>
+    <button class="tab" data-tab="alert">Investigating an Alert</button>
+  </div>
+
+  <div class="section active" id="why">
+    <h2 class="section-title">Why a SOC Matters</h2>
+    <p class="section-sub">Tools alone don't stop attacks — someone has to watch and act.</p>
+    <div class="grid" id="why-grid"></div>
+  </div>
+
+  <div class="section" id="tiers">
+    <h2 class="section-title">Tiers & Roles</h2>
+    <p class="section-sub">Why not every alert goes to your most senior person.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+        <rect x="270" y="10" width="160" height="35" rx="6" fill="#0F3A5C" stroke="#58A6FF"/><text x="350" y="32" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-size="10.5">CISO / SOC Director</text>
+        <line x1="350" y1="45" x2="350" y2="62" stroke="#26303C"/>
+        <rect x="270" y="62" width="160" height="35" rx="6" fill="#141B24" stroke="#26303C"/><text x="350" y="84" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10.5">SOC Manager</text>
+        <line x1="350" y1="97" x2="350" y2="114" stroke="#26303C"/>
+        <rect x="270" y="114" width="160" height="35" rx="6" fill="#141B24" stroke="#26303C"/><text x="350" y="136" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10.5">SOC Lead / Shift Sup.</text>
+        <line x1="350" y1="149" x2="350" y2="166" stroke="#26303C"/>
+
+        <rect x="60" y="166" width="170" height="45" rx="7" fill="#141B24" stroke="#3FB950"/><text x="145" y="184" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-weight="600" font-size="11">Tier 1</text><text x="145" y="200" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="9">triage, filter noise</text>
+
+        <rect x="265" y="166" width="170" height="45" rx="7" fill="#141B24" stroke="#D29922"/><text x="350" y="184" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-weight="600" font-size="11">Tier 2</text><text x="350" y="200" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="9">investigate, contain</text>
+
+        <rect x="470" y="166" width="170" height="45" rx="7" fill="#141B24" stroke="#EF4444"/><text x="555" y="184" text-anchor="middle" fill="#EF4444" font-family="JetBrains Mono" font-weight="600" font-size="11">Tier 3</text><text x="555" y="200" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="9">threat hunt, forensics</text>
+      </svg>
+      <div class="diagram-caption">Tier 1 filters the noise so Tier 2 and 3 can focus on what actually matters</div>
+    </div>
+    <div class="grid" id="tiers-grid"></div>
+  </div>
+
+  <div class="section" id="models">
+    <h2 class="section-title">SOC Deployment Models</h2>
+    <p class="section-sub">In-house, MSSP, hybrid, virtual, or co-managed — the tradeoffs of each.</p>
+    <div class="grid" id="models-grid"></div>
+  </div>
+
+  <div class="section" id="sla">
+    <h2 class="section-title">SLA — Service Level Agreement</h2>
+    <p class="section-sub">Response time commitments, mapped to severity.</p>
+    <div class="diagram-panel">
+      <div class="table-scroll">
+      <table class="cmd-table">
+        <tr><th>Severity</th><th>Example</th><th>Acknowledge</th><th>Contain / Resolve</th></tr>
+        <tr><td><code>P1 — Critical</code></td><td>Active breach, ransomware, data exfiltration</td><td>15 min</td><td>1–4 hours</td></tr>
+        <tr><td><code>P2 — High</code></td><td>Compromised account, malware on endpoint</td><td>30 min</td><td>4–8 hours</td></tr>
+        <tr><td><code>P3 — Medium</code></td><td>Suspicious login, policy violation</td><td>2 hours</td><td>24 hours</td></tr>
+        <tr><td><code>P4 — Low</code></td><td>Minor anomaly, informational alert</td><td>24–48 hours</td><td>—</td></tr>
+      </table>
+      </div>
+      <div class="diagram-caption">Severity determines urgency — these exact numbers vary by org, but the logic holds everywhere</div>
+    </div>
+    <div class="grid" id="sla-grid"></div>
+  </div>
+
+  <div class="section" id="alert">
+    <h2 class="section-title">Walking Through a Real Alert</h2>
+    <p class="section-sub">A worked example: an LFI attempt spotted in the logs.</p>
+    <div class="grid" id="alert-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  why: [
+    ["What is a SOC?","A SOC — Security Operations Center — is the centralized team that continuously watches, detects, investigates, and responds to security threats, usually leaning on tools like SIEM and EDR to actually see what's going on across the environment."],
+    ["Why does an organization actually need a SOC team?","A lot of people assume tools alone are enough, but tools only generate alerts — they don't decide what matters or take action. A SOC covers three things tools can't do on their own. First, continuous monitoring — attacks don't wait for business hours, so you need eyes on it 24/7. Second, correlation — a firewall, an EDR, and an identity system each see a fragment of the picture in isolation, and it's the SOC (using something like a SIEM) that connects those fragments into a real attack story. Third, actual response — isolating a system, revoking access, preserving evidence — none of that happens automatically. The SOC is what turns detection into action."]
+  ],
+  tiers: [
+    ["How is a SOC structured?","It's built as a tiered hierarchy so the hardest problems land on your best people, not everything hitting a senior analyst at once. At the top, the CISO and SOC Director own strategy and make sure the SOC's priorities match the business's actual risk. Below them, the SOC Manager runs day-to-day operations — SLAs, staffing, performance. The SOC Lead or shift supervisor manages the analysts on a given shift and is the first point of escalation.\n\nThen you've got the three analyst tiers. Tier 1 is the frontline — monitoring dashboards around the clock, triaging alerts, filtering out false positives using runbooks. If something looks genuinely suspicious, it goes to Tier 2, who do the deeper digging — log correlation, scoping the incident, containment, remediation. If it's something bigger — advanced malware, suspected APT activity, a real breach — it escalates to Tier 3, the senior analysts and threat hunters who do forensics and proactively hunt for things nobody's flagged yet.\n\nAlongside all three tiers you've also got specialists — threat intel analysts, DFIR, SIEM engineers, red team — supporting the whole structure. The whole point of the model is that Tier 1 absorbs the volume so Tier 2 and 3 can spend their time on what actually matters."]
+  ],
+  models: [
+    ["What are the different SOC models?","There are really five common ones, and which one makes sense depends on budget, risk tolerance, and how mature the internal team already is.\n\nIn-House SOC — you build and run everything yourself. Full control, but expensive and genuinely hard to staff for 24/7 coverage.\n\nMSSP — you outsource the whole thing to a managed provider. Fast to stand up and cheaper, but you lose a lot of visibility and control over your own environment.\n\nHybrid SOC — the most common setup in mature orgs today. The MSSP handles high-volume Tier 1 monitoring around the clock, while your internal team owns Tier 2 and Tier 3, where actual judgment calls happen.\n\nVirtual SOC — fully remote analysts working off cloud-based tools. Low overhead and globally scalable, but coordinating during a live incident is genuinely harder.\n\nCo-Managed SOC — your team keeps ownership of tools and strategy, but brings in an MSSP to fill specific gaps, like after-hours coverage or specialized forensics skills."],
+    ["MSSP vs Co-Managed SOC — what's the actual difference?","With an MSSP, the provider owns everything — the tools, the analysts, the process. You're a customer buying a service. With co-managed, your internal team still leads; you keep ownership of the tools and strategy, and the MSSP just fills in specific gaps like after-hours Tier 1 or specialized skills. The real distinction is ownership and control — customer versus partner. Most orgs that already have some internal security team prefer co-managed, because they don't want to lose the institutional knowledge their own analysts have built up about the environment."],
+    ["Pros and cons of an in-house SOC?","The big upside is control — full visibility, custom detection rules, and instant access to internal systems the moment something happens. Your analysts also build up deep knowledge of the environment over time, which makes them genuinely more effective at spotting what's actually abnormal.\n\nThe downside is real too — building a mature in-house SOC takes years and serious money. You're hiring across three analyst tiers, licensing SIEM/EDR/SOAR, and staffing 24/7. Retention is also a constant fight since experienced analysts are in high demand. For a lot of mid-sized orgs, it's just too expensive to justify, so they end up going hybrid instead."],
+    ["Why would an org pick Hybrid over a fully outsourced MSSP?","Because a fully outsourced MSSP is managing dozens or hundreds of clients at once — their analysts don't have deep context on your specific environment or business, so their response tends to be slower and more generic. With hybrid, you push the repetitive, high-volume Tier 1 work out to the MSSP for cheap 24/7 coverage, but keep the actual investigation and decision-making with your own Tier 2/3 analysts who know your environment. That also keeps sensitive data handling internal, which matters a lot for regulated industries like finance or healthcare."],
+    ["What's a Virtual SOC, and when would you recommend it?","It's a SOC with no physical facility — analysts are distributed, working entirely off cloud-based SIEM, EDR, and SOAR tooling. I'd recommend it for cloud-native companies or startups that don't have heavy physical infrastructure to protect and want to move fast without a big upfront investment. It's low overhead, taps into a global talent pool, and there's no single point of failure. The tradeoff is that remote coordination during a high-pressure incident is harder, and you're trusting the security of each analyst's home setup. It's become a lot more viable post-pandemic as the tooling matured."],
+    ["How would you choose the right SOC model for an organization?","I'd look at four things. Budget — in-house needs serious upfront and ongoing investment, MSSP or virtual is cheaper. Risk and compliance — regulated industries like banking often need in-house or hybrid to keep data internal. Internal maturity — if there's already a skilled security team, co-managed builds on that; if there's nothing yet, starting with an MSSP is more realistic. And size and complexity — a global company needs follow-the-sun coverage, while a small cloud-first company might do fine with a virtual SOC. In the end it comes down to matching the model to the org's actual risk tolerance and business goals, not just picking the cheapest option."]
+  ],
+  sla: [
+    ["What is an SLA in a SOC context?","SLA stands for Service Level Agreement, and in a SOC it's a time-based commitment — from the moment an alert fires, there's a defined window for acknowledging it, investigating it, and responding. The timelines scale with severity: something like ransomware needs acknowledgment within minutes and containment within hours, while a low-priority alert can wait longer. Without SLAs, incident handling turns unstructured fast — SLAs are what force the team to prioritize real threats over noise."],
+    ["What happens during an SLA breach?","An SLA breach is when the team doesn't respond or resolve within the agreed window. My first priority in that moment is just containing the impact — get the incident under control regardless of the missed clock. Once it's stable, I'd do a root cause analysis to understand why it slipped — was it alert overload, a tooling gap, a process breakdown? Then I'd communicate clearly with stakeholders, document everything, and put in corrective actions — better playbooks, tuned alerting, more automation — so it doesn't happen again."]
+  ],
+  alert: [
+    ["How would you investigate a possible LFI alert?","I'd start by pulling the basics — source IP, destination IP, the requested URL, and whatever triggered the alert. If the URL contains something like /etc/passwd, that's a strong sign of path traversal or an LFI attempt.\n\nFrom there I'd check the related logs for that source IP to see if this was a one-off probe or part of a repeated pattern. Then I'd actually look at the request and response — if the payload shows clear traversal like ../../../../etc/passwd but the server responded with a 500 error, that tells me the attack likely failed and nothing sensitive got exposed.\n\nI'd also run a threat intel lookup on the source IP. Even if the reputation comes back neutral, the behavior itself is already suspicious enough to treat seriously. Based on all that, I'd classify it as a malicious but unsuccessful LFI attempt, external to internal, with no sign of persistence or lateral movement — so it might not need escalation, but I'd keep watching for repeat attempts from that IP and recommend tightening input validation and WAF rules to catch that pattern going forward."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">"${a}"</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

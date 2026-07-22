@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Threat Intelligence, Explained</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --teal:#14B8A6;--blue:#58A6FF;--amber:#D29922;--red:#EF4444;--purple:#BC8CFF;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(20,184,166,0.13), transparent 45%),radial-gradient(circle at 90% 10%, rgba(88,166,255,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(20,184,166,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--teal);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,5vw,42px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--teal);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#0D1117;background:var(--teal);border-color:var(--teal);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:#5EEAD4;}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;font-style:italic;white-space:pre-line;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .table-scroll{width:100%;overflow-x:auto;}
+  .cmd-table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+  .cmd-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--line);}
+  .cmd-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top;}
+  .cmd-table code{font-family:'JetBrains Mono',monospace;background:rgba(20,184,166,0.16);color:#5EEAD4;padding:2px 7px;border-radius:5px;font-size:12.5px;white-space:nowrap;}
+  .cmd-table tr:last-child td{border-bottom:none;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:23px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}.cmd-table th,.cmd-table td{padding:8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// threat intelligence interview notes</div>
+    <h1>Threat <span>Intelligence</span></h1>
+    <p>IOC vs IOA, feeds, STIX/TAXII, and how TI actually plugs into a SIEM — explained the way you'd say it out loud in an interview.</p>
+  </div>
+  <div class="badge-row"><span class="badge">25+ topics</span><span class="badge">IOC vs IOA</span><span class="badge">natural spoken answers</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="basics">What is TI?</button>
+    <button class="tab" data-tab="ioc">IOC vs IOA</button>
+    <button class="tab" data-tab="feeds">Feeds & Platforms</button>
+    <button class="tab" data-tab="soc">TI in a SOC / SIEM</button>
+    <button class="tab" data-tab="standards">STIX & TAXII</button>
+  </div>
+
+  <div class="section active" id="basics">
+    <h2 class="section-title">What is Threat Intelligence?</h2>
+    <p class="section-sub">Turning raw information about attackers into something a SOC can act on.</p>
+    <div class="grid" id="basics-grid"></div>
+  </div>
+
+  <div class="section" id="ioc">
+    <h2 class="section-title">IOC vs IOA</h2>
+    <p class="section-sub">Evidence something already happened, versus a sign something's happening right now.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="30" width="290" height="95" rx="10" fill="#141B24" stroke="#58A6FF"/>
+        <text x="175" y="55" text-anchor="middle" fill="#58A6FF" font-family="Space Grotesk" font-weight="600" font-size="14">IOC — Indicator of Compromise</text>
+        <text x="175" y="78" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">a known bad IP, hash, or domain</text>
+        <text x="175" y="96" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">"this artifact is malicious"</text>
+
+        <rect x="380" y="30" width="290" height="95" rx="10" fill="#141B24" stroke="#14B8A6"/>
+        <text x="525" y="55" text-anchor="middle" fill="#14B8A6" font-family="Space Grotesk" font-weight="600" font-size="14">IOA — Indicator of Attack</text>
+        <text x="525" y="78" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">encoded PowerShell, priv escalation</text>
+        <text x="525" y="96" text-anchor="middle" fill="#8B98A5" font-family="Inter" font-size="10.5">"this behavior looks like an attack"</text>
+      </svg>
+      <div class="diagram-caption">IOC looks at known artifacts. IOA looks at behavior — which is what catches things nobody's seen before</div>
+    </div>
+    <div class="grid" id="ioc-grid"></div>
+  </div>
+
+  <div class="section" id="feeds">
+    <h2 class="section-title">Feeds & Platforms</h2>
+    <p class="section-sub">Where the actual threat data comes from.</p>
+    <div class="diagram-panel">
+      <div class="table-scroll">
+      <table class="cmd-table">
+        <tr><th>Open-source feeds</th><th>Commercial platforms</th></tr>
+        <tr><td>Abuse.ch</td><td>IBM X-Force Exchange</td></tr>
+        <tr><td>OSINT sources</td><td>Anomali ThreatStream</td></tr>
+        <tr><td>threatfeeds.io</td><td>Palo Alto Networks AutoFocus</td></tr>
+        <tr><td>autoshun.org</td><td>FireEye iSIGHT</td></tr>
+        <tr><td>malwaredomainlist.com</td><td>Recorded Future</td></tr>
+      </table>
+      </div>
+    </div>
+    <div class="grid" id="feeds-grid"></div>
+  </div>
+
+  <div class="section" id="soc">
+    <h2 class="section-title">How TI Gets Used in a SOC</h2>
+    <p class="section-sub">Where threat intelligence actually lives in the day-to-day.</p>
+    <div class="grid" id="soc-grid"></div>
+  </div>
+
+  <div class="section" id="standards">
+    <h2 class="section-title">STIX & TAXII</h2>
+    <p class="section-sub">The format and the pipe — what's shared, and how it moves.</p>
+    <div class="grid" id="standards-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  basics: [
+    ["What is Threat Intelligence?","It's basically the process of collecting and making sense of information about threats out there — attacker infrastructure, malware, tactics — so an organization can be proactive about detecting and stopping attacks instead of just reacting after the fact."],
+    ["Why is Threat Intelligence important?","Because it lets you catch things earlier. Instead of waiting for an attack to hit and then investigating, TI feeds you known bad IPs, domains, and behaviors ahead of time, so your monitoring and blocking can happen before real damage occurs."],
+    ["What are common Indicators of Compromise?","IP addresses, URLs, file hashes, domains, and suspicious email addresses — basically the artifacts you'd check a system's logs against to see if it's already been touched by something malicious."],
+    ["What is US-CERT?","It's a cybersecurity body under the US Department of Homeland Security that puts out threat alerts, vulnerability disclosures, and advisories — a good source to reference if asked where you'd track emerging threats."]
+  ],
+  ioc: [
+    ["What is an IOC?","An IOC is a piece of evidence that a system or network has already been compromised — think a known malicious IP, a suspicious domain, a malware hash, or a phishing URL. If a machine connects to an IP flagged on something like abuse.ch, that connection itself becomes the IOC — it tells the security team there's something to investigate."],
+    ["What is an IOA?","An IOA is different — it's about behavior, not a known-bad artifact. It's a sign that an attack might be happening right now, even if nothing matches a known malicious file or IP. Multiple failed logins, privilege escalation, PowerShell reaching out to download something, antivirus getting disabled, weird lateral movement between systems — all of that is IOA territory. The value is that it can catch zero-days and brand-new attacks that no IOC list would ever have flagged."],
+    ["Why do we use IOA specifically?","Because relying only on known-bad indicators means you always miss the first occurrence of something new. IOA lets you catch attacker behavior in real time — like a user account suddenly hopping across multiple systems and running encoded PowerShell — even when nothing about it matches a known signature."]
+  ],
+  feeds: [
+    ["Which threat intelligence platforms do you know?","VirusTotal, IBM X-Force, ThreatCrowd, Recorded Future, and AlienVault OTX are the ones that come up most."],
+    ["Which is your favorite platform, and why?","VirusTotal, honestly — it's just really practical day-to-day. You throw a file, hash, URL, or domain at it and it runs it through a dozen-plus engines at once, so you get a fast read on whether something's actually malicious."]
+  ],
+  soc: [
+    ["How is Threat Intelligence used in a SOC?","SOC teams plug TI feeds directly into their SIEM and other security tools, so known malicious IPs, domains, and hashes get flagged automatically during monitoring instead of analysts having to look each one up manually."],
+    ["How can a firewall use Threat Intelligence?","It can pull from those same feeds and automatically block traffic to or from known malicious IPs and domains — no manual rule needed for every new bad actor."],
+    ["How does Threat Intelligence actually work?","At a high level, it's about collecting and sharing information on malicious IPs, domains, URLs, hashes, and attacker behavior. Tools like SIEM, firewalls, and EDR then check activity against that data and take action — block, alert, or flag for review."],
+    ["Where does Threat Intelligence actually sit in the network?","It's not something you install on-prem in the traditional sense — it's mostly a subscription service from a vendor, and it gets integrated into whatever security tools you're already running."],
+    ["Can you give an example of how you'd consume Threat Intelligence?","Sure — during alert triage, I might check a suspicious domain or file hash against VirusTotal, or feed IOC lists directly into the SIEM so it flags matches automatically going forward."]
+  ],
+  standards: [
+    ["What is STIX?","STIX stands for Structured Threat Information Expression — it's basically the standard format used to describe threat intelligence in a way different tools can understand consistently. In short: STIX defines what's being shared."],
+    ["What is TAXII?","TAXII, Trusted Automated Exchange of Indicator Information, is the protocol that actually moves that STIX data between systems automatically. So if STIX is the format, TAXII is how it gets delivered."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">"${a}"</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
