@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Networking Fundamentals</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1117;--panel:#141B24;--line:#26303C;
+    --cyan:#22D3EE;--blue:#58A6FF;--green:#3FB950;--amber:#D29922;--orange:#F05033;--purple:#BC8CFF;
+    --text:#E6EDF3;--muted:#8B98A5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(circle at 15% 0%, rgba(34,211,238,0.12), transparent 45%),radial-gradient(circle at 90% 10%, rgba(88,166,255,0.08), transparent 40%),var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px;}
+  .hero{padding:34px 30px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg, rgba(34,211,238,0.10), rgba(20,27,36,0.4));margin-bottom:28px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase;margin-bottom:10px;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,44px);margin:0 0 10px;line-height:1.05;letter-spacing:-.01em;}
+  .hero h1 span{color:var(--cyan);}
+  .hero p{color:var(--muted);max-width:580px;margin:0 0 20px;font-size:15px;line-height:1.55;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .tab{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .tab:hover{color:var(--text);border-color:#3a4550;}
+  .tab.active{color:#0D1117;background:var(--cyan);border-color:var(--cyan);font-weight:600;}
+  .section{display:none;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 4px;}
+  .section-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:12px;padding:16px 18px;}
+  .card .q{font-size:14.5px;font-weight:600;line-height:1.4;margin-bottom:10px;color:var(--cyan);}
+  .card .a{font-size:13px;line-height:1.6;color:#D6E2EE;margin:0;white-space:pre-line;}
+  .card .a b{color:#E6EDF3;}
+  .diagram-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px;}
+  .diagram-panel svg{width:100%;height:auto;display:block;}
+  .diagram-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+  .table-scroll{width:100%;overflow-x:auto;}
+  .cmd-table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+  .cmd-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--line);}
+  .cmd-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top;}
+  .cmd-table code{font-family:'JetBrains Mono',monospace;background:rgba(34,211,238,0.14);color:var(--cyan);padding:2px 7px;border-radius:5px;font-size:12.5px;white-space:nowrap;}
+  .cmd-table tr:last-child td{border-bottom:none;}
+  .badge-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;font-family:'JetBrains Mono',monospace;}
+  @media(max-width:768px){.wrap{padding:24px 14px 60px;}.hero{padding:24px 18px;}.hero p{font-size:14px;}.grid{grid-template-columns:1fr;gap:12px;}.section-title{font-size:19px;}.diagram-panel{padding:16px;}}
+  @media(max-width:480px){.wrap{padding:18px 10px 50px;}.hero{padding:20px 14px;border-radius:14px;}.hero h1{font-size:24px;}.tabs{gap:5px;padding-bottom:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px;}.tabs::-webkit-scrollbar{display:none;}.tab{padding:8px 12px;font-size:11.5px;flex:0 0 auto;}.card{padding:14px 15px;}.card .q{font-size:13.5px;}.card .a{font-size:12.5px;}.cmd-table th,.cmd-table td{padding:8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-eyebrow">// networking fundamentals notes</div>
+    <h1>Networking <span>Fundamentals</span></h1>
+    <p>Devices, NAT/PAT, TCP handshakes, DNS, DHCP, ARP, firewalls, IDS/IPS, VPNs, and IP addressing — organized for quick review.</p>
+  </div>
+  <div class="badge-row"><span class="badge">50+ topics</span><span class="badge">9 sections</span></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="devices">Devices</button>
+    <button class="tab" data-tab="nat">NAT & PAT</button>
+    <button class="tab" data-tab="tcp">TCP/UDP & Handshake</button>
+    <button class="tab" data-tab="packets">Packets & Flags</button>
+    <button class="tab" data-tab="models">OSI & TCP/IP Models</button>
+    <button class="tab" data-tab="dns">DNS & DHCP</button>
+    <button class="tab" data-tab="arp">ARP & ICMP</button>
+    <button class="tab" data-tab="firewall">Firewalls & Security</button>
+    <button class="tab" data-tab="ip">IP Addressing & Ports</button>
+    <button class="tab" data-tab="extras">Extras</button>
+  </div>
+
+  <div class="section active" id="devices">
+    <h2 class="section-title">Devices</h2>
+    <p class="section-sub">Hub, Switch, Router — the three basics.</p>
+    <div class="grid" id="devices-grid"></div>
+  </div>
+
+  <div class="section" id="nat">
+    <h2 class="section-title">NAT & PAT</h2>
+    <p class="section-sub">How private networks share a public IP.</p>
+    <div class="grid" id="nat-grid"></div>
+  </div>
+
+  <div class="section" id="tcp">
+    <h2 class="section-title">TCP/UDP & the Three-Way Handshake</h2>
+    <p class="section-sub">The two transport protocols, and how a TCP connection actually starts.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="20" width="110" height="40" rx="8" fill="#141B24" stroke="#58A6FF"/>
+        <text x="85" y="45" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-weight="600" font-size="12">client</text>
+        <rect x="560" y="20" width="110" height="40" rx="8" fill="#141B24" stroke="#3FB950"/>
+        <text x="615" y="45" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-weight="600" font-size="12">server</text>
+        <line x1="85" y1="60" x2="85" y2="150" stroke="#26303C" stroke-width="1"/>
+        <line x1="615" y1="60" x2="615" y2="150" stroke="#26303C" stroke-width="1"/>
+        <path d="M85,80 L615,80" stroke="#22D3EE" stroke-width="2" marker-end="url(#nt1)"/>
+        <text x="350" y="73" text-anchor="middle" fill="#22D3EE" font-family="JetBrains Mono" font-size="11">SYN (client's ISN)</text>
+        <path d="M615,108 L85,108" stroke="#D29922" stroke-width="2" marker-end="url(#nt2)"/>
+        <text x="350" y="101" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-size="11">SYN-ACK (server ISN + ack)</text>
+        <path d="M85,136 L615,136" stroke="#3FB950" stroke-width="2" marker-end="url(#nt1)"/>
+        <text x="350" y="129" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-size="11">ACK — connection established</text>
+        <defs>
+          <marker id="nt1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#22D3EE"/></marker>
+          <marker id="nt2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto-start-reverse"><path d="M8,0 L0,4 L8,8 z" fill="#D29922"/></marker>
+        </defs>
+      </svg>
+      <div class="diagram-caption">Confirms both sides are ready and synchronizes sequence numbers before any data flows</div>
+    </div>
+    <div class="grid" id="tcp-grid"></div>
+  </div>
+
+  <div class="section" id="packets">
+    <h2 class="section-title">Packets & TCP Flags</h2>
+    <p class="section-sub">What's actually inside a packet, and the control bits that manage a connection.</p>
+    <div class="grid" id="packets-grid"></div>
+  </div>
+
+  <div class="section" id="models">
+    <h2 class="section-title">OSI & TCP/IP Models</h2>
+    <p class="section-sub">The seven-layer and four-layer frameworks for network communication.</p>
+    <div class="diagram-panel">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+        <text x="175" y="20" text-anchor="middle" fill="#E6EDF3" font-family="Space Grotesk" font-weight="600" font-size="14">OSI (7 layers)</text>
+        <text x="525" y="20" text-anchor="middle" fill="#E6EDF3" font-family="Space Grotesk" font-weight="600" font-size="14">TCP/IP (4 layers)</text>
+
+        <rect x="60" y="30" width="230" height="24" fill="#141B24" stroke="#26303C"/><text x="175" y="47" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10">7. Application</text>
+        <rect x="60" y="54" width="230" height="24" fill="#141B24" stroke="#26303C"/><text x="175" y="71" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10">6. Presentation</text>
+        <rect x="60" y="78" width="230" height="24" fill="#141B24" stroke="#26303C"/><text x="175" y="95" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10">5. Session</text>
+        <rect x="60" y="102" width="230" height="24" fill="#1B2430" stroke="#58A6FF"/><text x="175" y="119" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-size="10">4. Transport</text>
+        <rect x="60" y="126" width="230" height="24" fill="#1B2430" stroke="#3FB950"/><text x="175" y="143" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-size="10">3. Network</text>
+        <rect x="60" y="150" width="230" height="24" fill="#1B2430" stroke="#D29922"/><text x="175" y="167" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-size="10">2. Data Link</text>
+        <rect x="60" y="174" width="230" height="24" fill="#1B2430" stroke="#F05033"/><text x="175" y="191" text-anchor="middle" fill="#F05033" font-family="JetBrains Mono" font-size="10">1. Physical</text>
+
+        <rect x="410" y="30" width="230" height="72" fill="#141B24" stroke="#26303C"/><text x="525" y="70" text-anchor="middle" fill="#8B98A5" font-family="JetBrains Mono" font-size="10">Application</text>
+        <rect x="410" y="102" width="230" height="24" fill="#1B2430" stroke="#58A6FF"/><text x="525" y="119" text-anchor="middle" fill="#58A6FF" font-family="JetBrains Mono" font-size="10">Transport</text>
+        <rect x="410" y="126" width="230" height="24" fill="#1B2430" stroke="#3FB950"/><text x="525" y="143" text-anchor="middle" fill="#3FB950" font-family="JetBrains Mono" font-size="10">Internet</text>
+        <rect x="410" y="150" width="230" height="48" fill="#1B2430" stroke="#D29922"/><text x="525" y="178" text-anchor="middle" fill="#D29922" font-family="JetBrains Mono" font-size="10">Network Access</text>
+      </svg>
+      <div class="diagram-caption">TCP/IP condenses OSI's top three layers into one, and merges Data Link + Physical into Network Access</div>
+    </div>
+    <div class="grid" id="models-grid"></div>
+  </div>
+
+  <div class="section" id="dns">
+    <h2 class="section-title">DNS & DHCP</h2>
+    <p class="section-sub">Resolving domain names, and automatically assigning IP addresses.</p>
+    <div class="grid" id="dns-grid"></div>
+  </div>
+
+  <div class="section" id="arp">
+    <h2 class="section-title">ARP & ICMP</h2>
+    <p class="section-sub">Finding a MAC address, and testing connectivity.</p>
+    <div class="grid" id="arp-grid"></div>
+  </div>
+
+  <div class="section" id="firewall">
+    <h2 class="section-title">Firewalls & Security</h2>
+    <p class="section-sub">Proxy servers, ACLs, stateful vs stateless, IDS/IPS, DMZ, VPN.</p>
+    <div class="grid" id="firewall-grid"></div>
+  </div>
+
+  <div class="section" id="ip">
+    <h2 class="section-title">IP Addressing & Ports</h2>
+    <p class="section-sub">Public/private/static/dynamic IPs, IPv4 vs IPv6, and common ports.</p>
+    <div class="diagram-panel">
+      <div class="table-scroll">
+      <table class="cmd-table">
+        <tr><th>Port</th><th>Service</th></tr>
+        <tr><td><code>20 / 21</code></td><td>FTP</td></tr>
+        <tr><td><code>22</code></td><td>SSH</td></tr>
+        <tr><td><code>23</code></td><td>Telnet</td></tr>
+        <tr><td><code>25</code></td><td>SMTP</td></tr>
+        <tr><td><code>53</code></td><td>DNS</td></tr>
+        <tr><td><code>67 / 68</code></td><td>DHCP (server / client)</td></tr>
+        <tr><td><code>80</code></td><td>HTTP</td></tr>
+        <tr><td><code>161</code></td><td>SNMP</td></tr>
+        <tr><td><code>443</code></td><td>HTTPS</td></tr>
+        <tr><td><code>514</code></td><td>Syslog</td></tr>
+        <tr><td><code>3389</code></td><td>RDP</td></tr>
+      </table>
+      </div>
+      <div class="diagram-caption">The port list worth having memorized cold</div>
+    </div>
+    <div class="grid" id="ip-grid"></div>
+  </div>
+
+  <div class="section" id="extras">
+    <h2 class="section-title">Extras</h2>
+    <p class="section-sub">URL-to-browser flow, PCAP/DCAP, port scanning, OSI-layer devices.</p>
+    <div class="grid" id="extras-grid"></div>
+  </div>
+
+  <footer>tap a tab above to jump between topics</footer>
+</div>
+
+<script>
+const data = {
+  devices: [
+    ["What is a Hub?","Hub is a layer 1 device that connects multiple computers. Hub is usually termed a dumb device, because it broadcasts all the data to every port."],
+    ["What is a Switch?","Switch is a layer 2 device that connects two or more computers.\n\nSwitch can decide which computer the message is intended for and send the message directly to the right computer (instead of a broadcast)."],
+    ["What is a Router?","Router is a Layer 3 device that connects 2 or more networks.\n\nRouter can calculate the best route for sending data from one point to another using routing protocols."]
+  ],
+  nat: [
+    ["PAT (Port Address Translator)","PAT allows many devices in a local network to access the internet using one public IP address by using different port numbers."],
+    ["NAT (Network Address Translation)","NAT is the process of converting one IP to another. Usually a Private IP to Public IP and vice versa."],
+    ["NAT in networking vs firewalls","NAT is used in both networking and firewalls for IP address translation.\n\nIn networking, it is mainly used by routers to convert private IP addresses to public IPs for internet connectivity.\n\nIn firewalls, NAT is combined with security policies to control traffic, apply access rules, and generate logs for monitoring and analysis."]
+  ],
+  tcp: [
+    ["TCP and UDP","TCP stands for Transmission Control Protocol. It is a connection-oriented protocol that ensures reliable communication. It provides acknowledgment for each packet transmitted. If any packet is lost, TCP retransmits it. It also maintains packet order. Because of these reliability mechanisms, TCP is slower compared to UDP. Examples: HTTP, HTTPS, SSH, FTP.\n\nUDP stands for User Datagram Protocol. It is a connectionless protocol that does not provide acknowledgment or retransmission. It does not guarantee delivery or order of packets. Since it avoids these overhead mechanisms, UDP is faster. Commonly used in gaming, video streaming, and DNS queries."],
+    ["Three-Way Handshake","A TCP process used to establish a reliable connection between a client and a server before data transmission. It ensures both sides are ready, sequence numbers are synchronized, and the connection is reliable.\n\nThe client sends a SYN packet with its Initial Sequence Number (ISN) to the server.\n\nThe server responds with a SYN-ACK packet, containing its own sequence number and acknowledging the client's ISN.\n\nFinally, the client sends an ACK packet to confirm the connection. After this, the TCP connection is established."]
+  ],
+  packets: [
+    ["Packet","A packet is a small unit of data transferred over a network from a source device to a destination device.\n\nA packet mainly contains three parts:\nIP Header — used for routing, contains source and destination IP address.\nTCP Header — used for communication control, contains source port, destination port, sequence numbers.\nPayload — contains the actual data being transmitted, such as a webpage, file, or message."],
+    ["TCP Flags","TCP flags are control bits in the TCP header used to manage communication between two devices in a TCP connection.\n\nSYN — Starts a connection\nACK — Acknowledges received data\nFIN — Closes a connection\nRST — Resets a connection\nPSH — Sends data immediately to the application\nURG — Marks urgent data"]
+  ],
+  models: [
+    ["OSI Model","The OSI model is a seven-layer framework used to standardize network communication, where each layer performs a specific role from physical data transmission to user interaction.\n\nPhysical → transmitting raw data through cables and hardware.\nData Link → error-free communication, uses MAC addresses.\nNetwork → routing using IP addresses.\nTransport → reliable data transfer using TCP and UDP.\nSession → establishing, managing, and terminating communication sessions.\nPresentation → data formatting, encryption, and compression.\nApplication → where the user interacts (browsing, email, file transfer)."],
+    ["OSI example — sending a WhatsApp message","When I send a message on WhatsApp, I interact with the application layer, the presentation layer encrypts the data, the session layer maintains the connection, the transport layer ensures reliable delivery, the network layer routes the data using IP addresses, the data link layer uses MAC addresses for local communication, and finally the physical layer transmits the data as signals."],
+    ["TCP/IP Model","A set of communication protocols used for data transmission over the internet. It consists of four layers: Application, Transport, Internet, and Network Access, where TCP ensures reliable delivery and IP handles addressing and routing.\n\nApplication — where the user interacts with the network.\nTransport — end-to-end communication and reliable delivery (TCP/UDP).\nInternet — sends packets from source to destination using IP.\nNetwork Access — physical transmission of data over the network."]
+  ],
+  dns: [
+    ["DNS — port 53","DNS translates human-readable domain names into IP addresses that computers use to identify each other on a network.\n\nHow it works: DNS sends a request to a DNS resolver, which checks for the IP address. If not found, it contacts the root server, then the top-level domain server, and finally the authoritative server to get the correct IP address and load the website."],
+    ["DNS Records","A record — maps a domain to an IPv4 address.\nAAAA record — maps to an IPv6 address.\nCNAME record — aliasing one domain to another.\nMX record — handling email servers.\nNS record — specifying authoritative name servers.\nTXT record — used for verification and security purposes."],
+    ["Does DNS use TCP or UDP?","DNS uses both TCP and UDP. UDP for DNS queries and TCP for zone transfer."],
+    ["DHCP","DHCP (Dynamic Host Configuration Protocol) automatically assigns IP addresses and other network settings to devices in a network.\n\nIt follows the DORA process:\nDiscover — device sends a request to find a DHCP server.\nOffer — server responds with an available IP address.\nRequest — device sends a request to accept the IP address.\nAcknowledge — server confirms it.\n\nOnce assigned, the device can communicate with other devices on the network."],
+    ["Client IP when sending DISCOVER?","The source IP will be 0.0.0.0."],
+    ["What if no DHCP server is available?","The client assigns itself an APIPA address (169.254.x.x) for limited local communication."],
+    ["What happens when DHCP runs out of IPs?","The subnet is considered oversubscribed and cannot assign new IP addresses.\n\nAs a result: new devices won't receive an IP, they may get an APIPA address (169.254.x.x) on Windows, and they can't communicate properly.\n\nThe server assigns a new IP only when an existing device releases its IP, or the lease time expires."],
+    ["Why does DHCP have 2 port numbers?","DHCP uses two ports because it follows a client-server model. The client uses UDP port 68 and the server uses UDP port 67. This allows proper communication where the client sends requests and the server responds with IP configuration."]
+  ],
+  arp: [
+    ["ARP (Address Resolution Protocol)","ARP maps an IP address to a MAC address within a local network. When a device wants to communicate with another device on the same network, it knows the IP address but needs the MAC address to send data at the data link layer.\n\nHow it works:\n1. Sender checks its ARP cache for the MAC address.\n2. If not found, sends an ARP Request as a broadcast: 'Who has this IP? Tell me your MAC address.'\n3. All devices receive it, but only the matching device responds.\n4. Target sends an ARP Reply (unicast) with its MAC address.\n5. Sender stores this mapping in its ARP cache for future use.\n6. Communication can now happen using the MAC address."],
+    ["ICMP","ICMP (Internet Control Message Protocol) is a network layer protocol used for error reporting and network diagnostics. It helps devices communicate issues like unreachable hosts and is commonly used by tools like ping to check connectivity."],
+    ["What is ping?","A network diagnostic tool that uses ICMP to check connectivity between two devices and measure response time.\n\nHow it works: ping sends ICMP Echo Requests and measures the time taken to receive Echo Replies to check connectivity."]
+  ],
+  firewall: [
+    ["Proxy Server","A proxy server protects a computer network by acting as an intermediary between users and the internet. It hides the user's IP address, filters malicious traffic, and blocks unauthorized websites.\n\nIt also prevents direct access to internal systems, monitors network activity, and can inspect traffic for threats — acting as a security gateway between the internal network and the internet.\n\nExample: students connect to the internet through a proxy server, which blocks websites like YouTube, gaming, or social media, and monitors activity."],
+    ["Firewall","A network security system that monitors and controls incoming and outgoing traffic based on predefined security rules. It acts as a barrier between trusted and untrusted networks.\n\nModern firewalls can operate at multiple OSI layers, including Layer 3 (Network), Layer 4 (Transport), and Layer 7 (Application)."],
+    ["How a firewall works","A firewall monitors incoming and outgoing traffic and compares it against predefined security rules. When a packet arrives, it checks parameters like source IP, destination IP, port number, and protocol, then decides whether to allow or block it."],
+    ["Types of firewall","Packet filtering firewall — filters based on IP, port, protocol, but doesn't track connection state.\nStateful firewall — maintains a record of active connections, allows only packets belonging to a valid session, more secure.\nNext-generation firewall — deep packet inspection, application awareness, intrusion prevention, malware detection."],
+    ["What is an ACL?","Access Control List — a set of rules used to permit or deny network traffic based on criteria such as IP address, port number, and protocol. Commonly implemented in routers, switches, and firewalls."],
+    ["What is Implicit Deny?","Any traffic not explicitly allowed by rules is automatically blocked by default. This ensures only permitted traffic is allowed, improving security."],
+    ["Stateful vs Stateless firewalls","Stateless — inspects each packet independently based on predefined rules (IP, port, protocol), no memory of previous packets.\n\nStateful — keeps track of active connections via a state table, allows only packets part of an established, valid session — more secure and efficient."],
+    ["Router","A Layer 3 device that forwards packets between networks using IP addresses. Determines the best path using routing tables and routing protocols.\n\nHow: when a packet arrives, the router checks the destination IP, compares it with its routing table, and forwards the packet through the best available path."],
+    ["DMZ (Demilitarized Zone)","A separate network segment used to host public-facing servers such as web or mail servers. Acts as a buffer zone between the internal network and external networks, so even if these servers are compromised, the internal network stays protected."],
+    ["IDS and IPS","IDS — monitors traffic and detects suspicious/malicious activity, but takes no action, only generates alerts. Usually placed after the firewall in passive mode.\n\nIPS — monitors traffic and actively detects and blocks malicious activity in real time (e.g. blocking a brute-force attacker automatically). Usually placed inline, typically between the firewall and internal network."],
+    ["VPN","A secure connection that encrypts data and allows users to access a private network over the internet safely. Creates a secure tunnel that protects data from attackers. Example: employees use a VPN to securely access company systems from home."],
+    ["Deny vs Drop","'Deny' blocks the traffic and sends a message back to the sender. 'Drop' blocks the traffic without sending any response. Drop is more secure because it hides the system."],
+    ["Default Firewall Policy","Deny All — blocks all traffic except what is explicitly allowed. More secure.\nAllow All — allows all traffic except what is explicitly blocked. Less secure."]
+  ],
+  ip: [
+    ["What is an IP Address?","A unique identifier assigned to a device on a network, used to identify and communicate with other devices."],
+    ["Public IP","Assigned by the ISP. Accessible over the internet. Example: 8.8.8.8"],
+    ["Private IP","Used in a local network. Not accessible from the internet directly. Example ranges: 192.168.x.x, 10.x.x.x, 172.16.x.x – 172.31.x.x"],
+    ["Static IP","A fixed IP address that does not change. Used for servers."],
+    ["Dynamic IP","Automatically assigned via DHCP. Changes over time."],
+    ["IPv4 and IPv6","IPv4 uses 32-bit addresses, so it has limited address space. IPv4 is older and widely used today.\n\nIPv6 uses 128-bit addresses, providing a much larger address space with better efficiency and security."],
+    ["Loopback IP and its use","A special IP address used by a device to communicate with itself. The most commonly used loopback address is 127.0.0.1 (IPv4). Mainly used for testing network services, troubleshooting, and local development."]
+  ],
+  extras: [
+    ["What happens when you type a URL in a browser?","The browser checks its cache for the IP address.\n\nIf not found, it checks the OS cache.\n\nIf still not found, a DNS request is sent to resolve the domain into an IP address.\n\nOnce the IP is obtained, the browser establishes a TCP connection with the server.\n\nThe browser sends an HTTP/HTTPS request.\n\nThe server processes the request and sends back a response.\n\nThe browser renders and displays the webpage (HTML, CSS, JS)."],
+    ["Devices used at each OSI layer","Hubs at Layer 1, switches at Layer 2, routers at Layer 3, and firewalls/proxies at higher layers."],
+    ["What is PCAP?","Packet Capture — a file format used to store captured network traffic. Contains packets of data transmitted over a network. Used in tools like Wireshark and tcpdump. Helps in network analysis, troubleshooting, and security investigations."],
+    ["What is DCAP?","Data Capture — refers to capturing and analyzing data at rest or in use, not just network packets. Focuses on sensitive data monitoring. Used in data security, compliance, and data loss prevention (DLP)."],
+    ["Port scanning","The process of checking open ports on a system or network to identify available services and potential security vulnerabilities."]
+  ]
+};
+function buildGrid(id, items){
+  const grid = document.getElementById(id);
+  items.forEach(([q,a])=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="q">${q}</div><p class="a">${a}</p>`;
+    grid.appendChild(card);
+  });
+}
+Object.keys(data).forEach(k => buildGrid(k+'-grid', data[k]));
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
